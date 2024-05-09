@@ -1,0 +1,44 @@
+{
+  "name": "@techteamer/timestamp",
+  "version": "1.0.0",
+  "description": "This package contains a TimestampService, which can create and verity timestamps",
+  "main": "index.js",
+  "author": "Techteamer",
+  "contributors": [
+    "Bence Tihanyi <bence.tihanyi@facekom.com>",
+    "Béla Vizi <bela.vizi@facekom.dom>"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TechTeamer/timestamp"
+  },
+  "engines": {
+    "node": ">=20.5.1"
+  },
+  "scripts": {
+    "lint": "eslint . ./bin/**/* ./bin/* && echo 'npm run lint: OK'",
+    "lint:fix": "eslint . ./bin/**/* ./bin/* --fix",
+    "unit": "mocha --exit",
+    "test": "eslint . && nyc mocha --temp-directory=./test/coverage/ --exit && nyc report --reporter=text-lcov --report-dir=./test/coverage/ --reporter=lcovonly  | coveralls"
+  },
+  "dependencies": {
+    "moment": "^2.30.1",
+    "node-fetch": "^2.7.0",
+    "promise-retry": "^2.0.1",
+    "util": "^0.12.5",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "chai": "^5.1.1",
+    "coveralls": "^3.1.1",
+    "crypto": "^1.0.1",
+    "eslint": "^8.19.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jest": "^27.0.4",
+    "eslint-plugin-n": "^16.3.1",
+    "eslint-plugin-promise": "^6.0.0",
+    "mocha": "^10.4.0"
+  }
+}
