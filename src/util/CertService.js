@@ -58,6 +58,9 @@ class CertInfo {
 }
 
 class CertService {
+  constructor(encoding) {
+    this.encoding = encoding
+  }
   static get CertType () {
     return {
       P12: 'P12',
@@ -254,7 +257,7 @@ class CertService {
         const unescaped = value.replace(/\\"/g, '"')
 
         // Get cert encoding expectations from config (use latin1 as default for backwards compatibility reasons)
-        let encoding = config.get('certService.encoding', 'latin1')
+        let encoding = this.encoding
 
         // Regular expression that matches all encoded special characters
         const regex = /((?:\\[A-Z\d]{2}){2,4})/g

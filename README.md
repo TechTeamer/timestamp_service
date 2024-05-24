@@ -14,7 +14,7 @@ $ yarn add @techteamer/timestamp
 ```
 const { TrustedTimestampService: TrustedTimestampServiceLib } = require('@techteamer/timestamp')
 ...
-this.trustedTimestampService = new TrustedTimestampServiceLib(config.get('trustedTimestamp'))
+this.trustedTimestampService = new TrustedTimestampServiceLib(config.get('trustedTimestamp'), config.get('certService.encoding', 'latin1'))
 ```
 ### Default config
 

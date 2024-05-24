@@ -35,9 +35,11 @@ class TrustedTimestampService {
    * @property {provider[]}  [providers=[{provider}, {provider}, ...]]
    * @constructor
    * @param {config} config
+   * @param {string} encoding
    */
-  constructor (config) {
+  constructor (config, encoding) {
     this.config = config
+    this.encoding = encoding
     this.init()
   }
 
@@ -59,7 +61,7 @@ class TrustedTimestampService {
       }
 
       this.tempFileService = new TempFileService()
-      this.certService = new CertService()
+      this.certService = new CertService(this.encoding)
 
       this.providers = this.config.providers
       this.certsLocation = this.config.certsLocation
