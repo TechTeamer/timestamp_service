@@ -1,0 +1,94 @@
+# Timestamp
+
+Trustedtimestamp service implements the generate, import and verification of timestamps.
+
+## Install
+
+
+```
+$ yarn add @techteamer/timestamp
+```
+
+### Usage
+
+```
+const { TrustedTimestampService: TrustedTimestampServiceLib } = require('@techteamer/timestamp')
+...
+this.trustedTimestampService = new TrustedTimestampServiceLib(config.get('trustedTimestamp'))
+```
+### Default config
+
+```
+  "trustedTimestamp": {
+    "certsLocation": "/etc/ssl/certs/",
+    "providers": [
+      {
+        "name": "bteszt",
+        "url": "https://bteszt.e-szigno.hu/tsa",
+        "auth": {
+          "user": "<username>",
+          "pass": "<password>"
+        }
+      }
+    ]
+  }
+```
+
+### Config provider options
+
+#### Required fields
+* name (string)
+* url (string | object): Simple url string or object {getTokenUrl: string, getTimestampUrl: string}
+* auth (object): Username and password for auth (object): {user: string, pass: string}
+
+#### Optional fields
+* priority (number) - The order of the service providers can be changed, the higher number is the first
+* type (string) - Provider type (available options: "infocert")
+* body (object) -  The infocert type provider can set body parameter
+---------------------------------
+
+### Config example
+```
+  "trustedTimestamp": {
+    {
+      "certsLocation": "/etc/ssl/certs/",
+      "providers": [
+        {
+          "name": "bteszt",
+          "url": "https://bteszt.e-szigno.hu/tsa",
+          "auth": {
+            "user": "<username>",
+            "pass": "<password>"
+          }
+        },
+        {
+          "name": "infocert 1 test",
+          "type": "infocert",
+          "priority": 999,
+          "url": {
+            "getTokenUrl": "https://idpstage.infocert.digital/auth/realms/delivery/protocol/openid-connect/token",
+            "getTimestampUrl": "https://apistage.infocert.digital/timestamp/v1/apply"
+          },
+          "auth": {
+            "user": "<username>",
+            "pass": "<password>"
+          },
+          "body": {
+            "grant_type": "client_credentials",
+            "scope": "timestamp"
+          }
+        }
+      ]
+    }
+  }
+```
+
+### Public methods
+
+
+- `getTimestampInfo`
+- `createTimestampToken`
+- `importTimestampToken`
+- `verifyToken`
+- `verifyTsr`
+- `testService`
