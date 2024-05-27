@@ -42,26 +42,36 @@ const parseRegex = require('../util/regexParser').parse
  * Extensions:
  * */
 class TimestampInfo {
-  constructor (tsText, error = null) {
+  /**
+  * @constructor
+  * @param {string} type (vuer, esign)
+  * @param {string} tsText
+  * @param {string} error
+  */
+  constructor (type = 'vuer', tsText, error = null) {
     this.error = null
     this.version = null
     this.policyOID = null
     this.hashAlgorithm = null
-    this.hash = null
     this.serialNumber = null
     this.timeStamp = null
-    this.timeStampDate = null
     this.accuracy = null
     this.ordering = null
     this.nonce = null
-    this.issuer = null
     this.tsa = null
-    this.certInfo = null
 
     if (error) {
       this.error = error
     } else {
-      this.parseOpensslOutput(tsText)
+      if (type === 'esign') {
+        this.parseOpensslOutputEsign(tsText)
+      } else {
+        this.hash = null
+        this.timeStampDate = null
+        this.issuer = null
+        this.certInfo = null
+        this.parseOpensslOutput(tsText)
+      }
     }
   }
 
@@ -96,6 +106,37 @@ class TimestampInfo {
     this.issuer = parseRegex(tsText, /TSA:\s*DirName:\s*([^\n\r]+)/, 1)
     this.tsa = parseRegex(tsText, /TSA:\s*DirName:\s*([^\n\r]+)/, 1, (result) => {
       const m = result.match(/\/\w{1,2}=[^/]+/g) || []
+
+      return m.reduce((obj, part) => {
+        const [, label, value] = part.match(/\/(\w{1,2})=([^/]+)/) || []
+        if (!label || !value) {
+          return obj
+        }
+        obj[label] = value
+        return obj
+      }, { C: null, L: null, O: null, OU: null, CN: null })
+    })
+  }
+
+  /**
+   * @param {string} tsText
+   */
+  parseOpensslOutputEsign (tsText) {
+    this.version = parseRegex(tsText, /Version:\s*([^\n\r]+)/, 1, parseInt)
+    this.policyOID = parseRegex(tsText, /Policy OID:\s*([^\n\r]+)/, 1)
+    this.hashAlgorithm = parseRegex(tsText, /Hash Algorithm:\s*([^\n\r]+)/, 1)
+    this.serialNumber = parseRegex(tsText, /Serial number:\s*([^\n\r]+)/, 1)
+    this.timeStamp = parseRegex(tsText, /Time stamp:\s*([^\n\r]+)/, 1, dateString => new Date(dateString))
+    this.accuracy = parseRegex(tsText, /Accuracy:\s*(.+) seconds, (.+) millis, (.+) micros/, ['s', 'm', 'u'], ({ s, m, u }) => {
+      s = Number(s === 'unspecified' ? 0 : s)
+      m = Number(m === 'unspecified' ? 0 : m)
+      u = Number(u === 'unspecified' ? 0 : u)
+      return s * 1000 + m + u / 1000
+    })
+    this.ordering = parseRegex(tsText, /Ordering:\s*([^\n\r]+)/, 1, ordering => ordering !== 'no')
+    this.nonce = parseRegex(tsText, /Nonce:\s*([^\n\r]+)/, 1, nonce => nonce === 'unspecified' ? null : nonce)
+    this.tsa = parseRegex(tsText, /TSA:\s*([^\n\r]+)/, 1, (v) => {
+      const m = v.match(/\/\w{1,2}=[^/]+/g) || []
 
       return m.reduce((obj, part) => {
         const [, label, value] = part.match(/\/(\w{1,2})=([^/]+)/) || []

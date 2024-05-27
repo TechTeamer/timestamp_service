@@ -46,7 +46,7 @@ class TrustedTimestampRequest {
     for (const provider of this.sortedProviders()) {
       if (!timestampExists) {
         const { name, url, type, auth, body, proxy } = provider
-        if (name && url && auth) {
+        if (name && url) {
           timestampExists = await this.sendTimestampRequest(name, url, type, auth, body, proxy, tsQuery)
         } else {
           if (!name) {
@@ -54,9 +54,6 @@ class TrustedTimestampRequest {
           }
           if (!url) {
             throw new Error('Provider url is missing')
-          }
-          if (!auth) {
-            throw new Error('Provider auth is missing')
           }
         }
       }
@@ -142,7 +139,7 @@ class TrustedTimestampRequest {
    * @param {string} [body]
    * @return {object}
    **/
-  async getOauth(name, url, type, auth, body, proxy) {
+  async getOauth (name, url, type, auth, body, proxy) {
     const tsRequest = await this.getTimestampRequestSettings(name, url, type, auth, body, proxy)
     return await fetch(url, tsRequest).then(async (response) => {
       return await response.json()
@@ -162,11 +159,11 @@ class TrustedTimestampRequest {
    * @param {object} oauth
    * @return {object}
    **/
-  async getTimestampRequestSettings(name, url, type, auth, body, proxy, tsQuery, oauth) {
+  async getTimestampRequestSettings (name, url, type, auth, body, proxy, tsQuery, oauth) {
     // send the request to the TSA
     const tsRequest = {
       url,
-      method: 'POST',
+      method: 'POST'
     }
 
     if (proxy && proxy?.url) {
@@ -224,7 +221,7 @@ class TrustedTimestampRequest {
           tsRequest.body = fs.createReadStream(tempPath)
           tsRequest.headers = {
             ...tsRequest.headers,
-            "Content-length": fileSizeInBytes
+            'Content-length': fileSizeInBytes
           }
         }
       }
