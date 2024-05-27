@@ -58,7 +58,7 @@ class CertInfo {
 }
 
 class CertService {
-  constructor(encoding) {
+  constructor(encoding = 'latin1') {
     this.encoding = encoding
   }
   static get CertType () {
