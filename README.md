@@ -14,8 +14,11 @@ $ yarn add @techteamer/timestamp
 ```
 const { TrustedTimestampService: TrustedTimestampServiceLib } = require('@techteamer/timestamp')
 ...
-this.trustedTimestampService = new TrustedTimestampServiceLib(config.get('trustedTimestamp'), config.get('certService.encoding', 'latin1'))
+this.trustedTimestampService = new TrustedTimestampServiceLib('vuer', config.get('trustedTimestamp'), config.get('certService.encoding', 'latin1'))
 ```
+
+First param options: vuer, esign
+
 ### Default config
 
 ```
@@ -39,9 +42,9 @@ this.trustedTimestampService = new TrustedTimestampServiceLib(config.get('truste
 #### Required fields
 * name (string)
 * url (string | object): Simple url string or object {getTokenUrl: string, getTimestampUrl: string}
-* auth (object): Username and password for auth (object): {user: string, pass: string}
 
 #### Optional fields
+* auth (object): Username and password for auth (object): {user: string, pass: string}
 * priority (number) - The order of the service providers can be changed, the higher number is the first
 * type (string) - Provider type (available options: "infocert")
 * body (object) -  The infocert type provider can set body parameter
