@@ -1,6 +1,18 @@
-# Timestamp
+Timestamp
+=============
 
 Trustedtimestamp service implements the generate, import and verification of timestamps.
+
+* [Install](#install)
+* [Usage](#usage)
+  * [Params](#params) 
+* [Default config](#default-config)
+* [Config provider options](#config-provider-options)
+  * [Required fields](#required-fields)
+  * [Optional fields](#optional-fields)
+* [Config example](#config-example)
+* [Public methods](#public-methods)
+
 
 ## Install
 
@@ -19,8 +31,8 @@ this.trustedTimestampService = new TrustedTimestampServiceLib('vuer', config.get
 
 #### Params
 1. TimestampInfo output type format: vuer, esign
-2. config: config.get('trustedTimestamp')
-3. encode type: config.get('certService.encoding', 'latin1')
+2. config: prodiders and cert location, config.get('trustedTimestamp')
+3. encode type(optional): config.get('certService.encoding', 'latin1')
 
 ### Default config
 
