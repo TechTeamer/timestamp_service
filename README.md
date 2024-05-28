@@ -17,7 +17,10 @@ const { TrustedTimestampService: TrustedTimestampServiceLib } = require('@techte
 this.trustedTimestampService = new TrustedTimestampServiceLib('vuer', config.get('trustedTimestamp'), config.get('certService.encoding', 'latin1'))
 ```
 
-First param options: vuer, esign
+#### Params
+1. TimestampInfo output type format: vuer, esign
+2. config: config.get('trustedTimestamp')
+3. encode type: config.get('certService.encoding', 'latin1')
 
 ### Default config
 
