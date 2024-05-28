@@ -44,11 +44,11 @@ const parseRegex = require('../util/regexParser').parse
 class TimestampInfo {
   /**
   * @constructor
-  * @param {string} type (vuer, esign)
+  * @param {string} timestampInfoType (normal, short)
   * @param {string} tsText
   * @param {string} error
   */
-  constructor (type = 'vuer', tsText, error = null) {
+  constructor (timestampInfoType = 'normal', tsText, error = null) {
     this.error = null
     this.version = null
     this.policyOID = null
@@ -63,8 +63,8 @@ class TimestampInfo {
     if (error) {
       this.error = error
     } else {
-      if (type === 'esign') {
-        this.parseOpensslOutputEsign(tsText)
+      if (timestampInfoType === 'short') {
+        this.parseOpensslOutputShort(tsText)
       } else {
         this.hash = null
         this.timeStampDate = null
@@ -121,7 +121,7 @@ class TimestampInfo {
   /**
    * @param {string} tsText
    */
-  parseOpensslOutputEsign (tsText) {
+  parseOpensslOutputShort (tsText) {
     this.version = parseRegex(tsText, /Version:\s*([^\n\r]+)/, 1, parseInt)
     this.policyOID = parseRegex(tsText, /Policy OID:\s*([^\n\r]+)/, 1)
     this.hashAlgorithm = parseRegex(tsText, /Hash Algorithm:\s*([^\n\r]+)/, 1)

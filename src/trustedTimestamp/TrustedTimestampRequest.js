@@ -45,9 +45,9 @@ class TrustedTimestampRequest {
 
     for (const provider of this.sortedProviders()) {
       if (!timestampExists) {
-        const { name, url, type, auth, body, proxy } = provider
+        const { name, url, auth, body, proxy } = provider
         if (name && url) {
-          timestampExists = await this.sendTimestampRequest(name, url, type, auth, body, proxy, tsQuery)
+          timestampExists = await this.sendTimestampRequest(name, url, auth, body, proxy, tsQuery)
         } else {
           if (!name) {
             throw new Error('Provider name is missing')
@@ -93,24 +93,24 @@ class TrustedTimestampRequest {
    *
    * @param {string} name
    * @param {string| urlObject} url
-   * @param {string} [type]
    * @param {string} [auth]
    * @param {string} [proxy]
    * @param {string} [body]
    * @param {string} tsQuery
    * @return {Promise<Buffer>}
    **/
-  async sendTimestampRequest (name, url, type, auth, body, proxy, tsQuery) {
-    let oauth
+  async sendTimestampRequest (name, url, auth, body, proxy, tsQuery) {
+    let access_token
     let requestUrl
-    if (type === 'infocert') {
-      oauth = await this.getOauth(name, url.getTokenUrl, type, auth, body, proxy)
+    if (url?.getTokenUrl && url?.getTimestampUrl) {
+      const oauth = await this.getOauth(name, url.getTokenUrl, auth, body, proxy)
+      access_token = oauth?.access_token
       requestUrl = url.getTimestampUrl
     } else {
       requestUrl = url
     }
 
-    const tsRequest = await this.getTimestampRequestSettings(name, requestUrl, type, auth, body, proxy, tsQuery, oauth)
+    const tsRequest = await this.getTimestampRequestSettings(name, url, auth, body, proxy, tsQuery, access_token)
     return await fetch(requestUrl, tsRequest).then(async (response) => {
       if (response.status !== 200) {
         throw new Error(`TSA response unsatisfactory: ${response.status} ${response.statusText}`)
@@ -133,14 +133,13 @@ class TrustedTimestampRequest {
    *
    * @param {string} name
    * @param {string} url
-   * @param {string} [type]
-   * @param {string} [auth]
+   * @param {object} auth
+   * @param {object} body
    * @param {string} [proxy]
-   * @param {string} [body]
    * @return {object}
    **/
-  async getOauth (name, url, type, auth, body, proxy) {
-    const tsRequest = await this.getTimestampRequestSettings(name, url, type, auth, body, proxy)
+  async getOauth (name, url, auth, body, proxy) {
+    const tsRequest = await this.getOauthRequestSettings(auth, body, proxy)
     return await fetch(url, tsRequest).then(async (response) => {
       return await response.json()
     })
@@ -150,30 +149,28 @@ class TrustedTimestampRequest {
    * getTimestampRequestSettings method that set the request settings
    *
    * @param {string} name
-   * @param {string} url
-   * @param {string} [type]
+   * @param {object | string} url
    * @param {string} [auth]
    * @param {string} [proxy]
    * @param {string} [body]
-   * @param {string} [tsQuery]
-   * @param {object} oauth
+   * @param {string} tsQuery
+   * @param {string} access_token
    * @return {object}
    **/
-  async getTimestampRequestSettings (name, url, type, auth, body, proxy, tsQuery, oauth) {
+  async getTimestampRequestSettings (name, url, auth, body, proxy, tsQuery, access_token) {
     // send the request to the TSA
     const tsRequest = {
-      url,
-      method: 'POST'
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/timestamp-query'
+      }
     }
 
     if (proxy && proxy?.url) {
       tsRequest.proxy = proxy.url
     }
 
-    if (type !== 'infocert') {
-      tsRequest.headers = {
-        'Content-Type': 'application/timestamp-query'
-      }
+    if (!access_token) {
       tsRequest.encoding = null // we expect binary data in a buffer: ensure that the response is not decoded unnecessarily
       tsRequest.resolveWithFullResponse = true
 
@@ -182,49 +179,56 @@ class TrustedTimestampRequest {
       }
     }
 
-    if (type === 'infocert') {
-      if (oauth) {
-        tsRequest.headers = {
-          'Content-Type': 'application/timestamp-query'
-        }
-      } else {
-        tsRequest.headers = {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
+    if (auth && !access_token) {
+      tsRequest.headers = {
+        ...tsRequest.headers,
+        Authorization: `Basic ${Buffer.from(auth.user + ':' + auth.pass).toString('base64')}`
       }
     }
 
-    if (auth) {
-      if (oauth) {
-        tsRequest.headers = {
-          ...tsRequest.headers,
-          Authorization: `Bearer ${oauth?.access_token}`
-        }
-      } else {
-        tsRequest.headers = {
-          ...tsRequest.headers,
-          Authorization: `Basic ${Buffer.from(auth.user + ':' + auth.pass).toString('base64')}`
-        }
+    if (access_token) {
+      tsRequest.headers = {
+        ...tsRequest.headers,
+        Authorization: `Bearer ${access_token}`
+      }
+
+      const { tempPath, cleanupCallback } = await this.tempFileService.createTempFile(this.tmpOptions, Buffer.from(tsQuery))
+      this.cleanupTempFns.push(cleanupCallback)
+
+      const stats = fs.statSync(tempPath)
+      const fileSizeInBytes = stats.size
+      tsRequest.body = fs.createReadStream(tempPath)
+      tsRequest.headers = {
+        ...tsRequest.headers,
+        'Content-length': fileSizeInBytes
       }
     }
 
-    if (body) {
-      if (type === 'infocert') {
-        if (!oauth) {
-          tsRequest.body = new URLSearchParams(body)
-        } else {
-          const { tempPath, cleanupCallback } = await this.tempFileService.createTempFile(this.tmpOptions, Buffer.from(tsQuery))
-          this.cleanupTempFns.push(cleanupCallback)
+    return tsRequest
+  }
 
-          const stats = fs.statSync(tempPath)
-          const fileSizeInBytes = stats.size
-          tsRequest.body = fs.createReadStream(tempPath)
-          tsRequest.headers = {
-            ...tsRequest.headers,
-            'Content-length': fileSizeInBytes
-          }
-        }
-      }
+  /**
+   * getOauthRequestSettings method that set the request oath settings
+   *
+   * @param {object} auth
+   * @param {object} body
+   * @param {string} [proxy]
+   * @return {object}
+   **/
+  async getOauthRequestSettings(auth, body, proxy) {
+    const tsRequest = {
+      method: 'POST'
+    }
+
+    tsRequest.headers = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: `Basic ${Buffer.from(auth.user + ':' + auth.pass).toString('base64')}`
+    }
+
+    tsRequest.body = new URLSearchParams(body)
+
+    if (proxy && proxy?.url) {
+      tsRequest.proxy = proxy.url
     }
 
     return tsRequest

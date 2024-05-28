@@ -34,12 +34,12 @@ class TrustedTimestampService {
    * @property {string}      [certsLocation="/etc/ssl/certs/"]
    * @property {provider[]}  [providers=[{provider}, {provider}, ...]]
    * @constructor
-   * @param {string} type (vuer, esign)
+   * @param {string} timestampInfoType (normal, short)
    * @param {config} config
    * @param {string} encoding
    */
-  constructor (type = 'vuer', config, encoding = 'latin1') {
-    this.type = type
+  constructor (timestampInfoType = 'normal', config, encoding = 'latin1') {
+    this.timestampInfoType = timestampInfoType
     this.config = config
     this.encoding = encoding
     this.init()
@@ -92,7 +92,7 @@ class TrustedTimestampService {
       cleanupTempFns.push(tsrtmp.cleanupCallback)
 
       const responseText = await getTsReply(inputTempPath, isToken)
-      const timestampInfo = new TimestampInfo(this.type, responseText)
+      const timestampInfo = new TimestampInfo(this.timestampInfoType, responseText)
 
       // get cert info
 
@@ -113,7 +113,7 @@ class TrustedTimestampService {
         // parse cert
         const certInfo = await this.certService.parseCert(Buffer.from(x509Cert), '', this.certService.CertType.PEM)
 
-        if (this.type === 'vuer') {
+        if (this.timestampInfoType === 'normal') {
           timestampInfo.setCertInfo(certInfo)
         }
       } catch (err) {
@@ -122,7 +122,7 @@ class TrustedTimestampService {
 
       return timestampInfo
     } catch (err) {
-      return new TimestampInfo(this.type, null, err.message)
+      return new TimestampInfo(this.timestampInfoType, null, err.message)
     } finally {
       for (const cleanUpFn of cleanupTempFns) {
         if (typeof cleanUpFn === 'function') {

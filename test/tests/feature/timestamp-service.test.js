@@ -22,7 +22,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
     const { TrustedTimestampService } = require('../../../index')
 
     it('success test - config ok', async () => {
-      const result = new TrustedTimestampService('vuer', {
+      const result = new TrustedTimestampService('normal', {
         certsLocation: '/etc/ssl/certs/',
         providers: [
           {
@@ -54,7 +54,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
 
     it('fail test - config missing providers', async () => {
       try {
-        const result = new TrustedTimestampService('vuer', {
+        const result = new TrustedTimestampService('normal', {
           certsLocation: '/etc/ssl/certs/'
         })
       } catch (error) {
@@ -64,7 +64,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
 
     it('fail test - config missing certsLocation', async () => {
       try {
-        const result = new TrustedTimestampService('vuer', {
+        const result = new TrustedTimestampService('normal', {
           providers: [
             {
               name: 'bteszt',
@@ -87,7 +87,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
     const { TrustedTimestampService } = require('../../../index')
 
     it('success test - createTimestampToken - create ok', async () => {
-      const trustedTimestampServiceInstance = new TrustedTimestampService('vuer', {
+      const trustedTimestampServiceInstance = new TrustedTimestampService('normal', {
         certsLocation: '/etc/ssl/certs/',
         providers: [
           {
@@ -122,7 +122,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
     const { TrustedTimestampService } = require('../../../index')
 
     it('success test - getTimestampInfo - create ok', async () => {
-      const trustedTimestampServiceInstance = new TrustedTimestampService('vuer', {
+      const trustedTimestampServiceInstance = new TrustedTimestampService('normal', {
         certsLocation: '/etc/ssl/certs/',
         providers: [
           {
@@ -164,7 +164,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
     const { TrustedTimestampService } = require('../../../index')
 
     it('success test - verifyToken', async () => {
-      const trustedTimestampServiceInstance = new TrustedTimestampService('vuer', {
+      const trustedTimestampServiceInstance = new TrustedTimestampService('normal', {
         certsLocation: '/etc/ssl/certs/',
         providers: [
           {
@@ -206,7 +206,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
     const { TrustedTimestampService } = require('../../../index')
 
     it('success test - verifyTsr', async () => {
-      const trustedTimestampServiceInstance = new TrustedTimestampService('vuer', {
+      const trustedTimestampServiceInstance = new TrustedTimestampService('normal', {
         certsLocation: '/etc/ssl/certs/',
         providers: [
           {
@@ -239,7 +239,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
     const { TrustedTimestampService } = require('../../../index')
 
     it('success test - ssl config ok', async () => {
-      const trustedTimestampServiceInstance = new TrustedTimestampService('vuer', {
+      const trustedTimestampServiceInstance = new TrustedTimestampService('normal', {
         certsLocation: '/etc/ssl/certs/',
         providers: [
           {

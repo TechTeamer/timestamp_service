@@ -26,11 +26,11 @@ $ yarn add @techteamer/timestamp
 ```
 const { TrustedTimestampService: TrustedTimestampServiceLib } = require('@techteamer/timestamp')
 ...
-this.trustedTimestampService = new TrustedTimestampServiceLib('vuer', config.get('trustedTimestamp'), config.get('certService.encoding', 'latin1'))
+this.trustedTimestampService = new TrustedTimestampServiceLib('normal', config.get('trustedTimestamp'), config.get('certService.encoding', 'latin1'))
 ```
 
 #### Params
-1. TimestampInfo output type format: vuer, esign
+1. TimestampInfo output type format: normal, short
 2. config: prodiders and cert location, config.get('trustedTimestamp')
 3. encode type(optional): config.get('certService.encoding', 'latin1')
 
@@ -61,7 +61,6 @@ this.trustedTimestampService = new TrustedTimestampServiceLib('vuer', config.get
 #### Optional fields
 * auth (object): Username and password for auth (object): {user: string, pass: string}
 * priority (number) - The order of the service providers can be changed, the higher number is the first
-* type (string) - Provider type (available options: "infocert")
 * body (object) -  The infocert type provider can set body parameter
 ---------------------------------
 
@@ -81,7 +80,6 @@ this.trustedTimestampService = new TrustedTimestampServiceLib('vuer', config.get
         },
         {
           "name": "infocert 1 test",
-          "type": "infocert",
           "priority": 999,
           "url": {
             "getTokenUrl": "https://idpstage.infocert.digital/auth/realms/delivery/protocol/openid-connect/token",
