@@ -1,12 +1,14 @@
 const nock = require('nock')
 
 jest.mock('../../../src/trustedTimestamp/TrustedTimestampCommand.js', () => ({
-  getTsQuery: jest.fn().mockResolvedValue('test'),
-  getTsVerify: jest.fn().mockResolvedValue('test'),
-  getTsReply: jest.fn().mockResolvedValue('test'),
-  generateTsReply: jest.fn().mockResolvedValue('test'),
-  extractCertFromToken: jest.fn().mockResolvedValue('test'),
-  checkSslPath: jest.fn().mockResolvedValue('test')
+  getTsQuery: jest.fn().mockResolvedValue(Buffer.from([{test:'test'}])),
+  getTsVerify: jest.fn().mockResolvedValue('Verification: ok'),
+  getTsReply: jest.fn().mockResolvedValue('Message data:\n' +
+    '        0000 - eb 0c 81 b5 01 05 7f 2a-23 1d 2e af e0 a2 c3 60   .......*#......`\n' +
+    '        0010 - 12 08 67 f6 fd e6 ab 0f-50 cb 8b 90 84 0f f7 c4   ..g.....P.......\n'),
+  generateTsReply: jest.fn().mockResolvedValue(Buffer.from([{test:'test'}])),
+  extractCertFromToken: jest.fn().mockResolvedValue(Buffer.from([{test:'test'}])),
+  checkSslPath: jest.fn().mockResolvedValue(Buffer.from([{test:'test'}])),
 }))
 
 describe('TrustedTimestampService.js (feature-test)', () => {
@@ -108,6 +110,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
       try {
         const result = await trustedTimestampServiceInstance.createTimestampToken(digest, hashAlgorithm, dataSize)
         await expect(result).not.toBe(null)
+        await expect(result.verified).toBe(true)
       } catch (error) {
         expect(error).toHaveProperty('message', 'test response')
       }
@@ -191,7 +194,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
 
       try {
         const result = await trustedTimestampServiceInstance.verifyToken(timestampToken, digest, dataSize)
-        await expect(result).not.toBe(null)
+        await expect(result).toBe(true)
       } catch (error) {
         expect(error).toHaveProperty('message', 'test response')
       }
@@ -224,7 +227,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
 
       try {
         const result = await trustedTimestampServiceInstance.verifyTsr(digest, tsr, isToken)
-        await expect(result).not.toBe(null)
+        await expect(result).toBe(true)
       } catch (error) {
         expect(error).toHaveProperty('message', 'test response')
       }
