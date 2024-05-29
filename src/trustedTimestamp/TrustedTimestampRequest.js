@@ -100,17 +100,17 @@ class TrustedTimestampRequest {
    * @return {Promise<Buffer>}
    **/
   async sendTimestampRequest (name, url, auth, body, proxy, tsQuery) {
-    let access_token
+    let accessToken
     let requestUrl
     if (url?.getTokenUrl && url?.getTimestampUrl) {
       const oauth = await this.getOauth(name, url.getTokenUrl, auth, body, proxy)
-      access_token = oauth?.access_token
+      accessToken = oauth?.access_token
       requestUrl = url.getTimestampUrl
     } else {
       requestUrl = url
     }
 
-    const tsRequest = await this.getTimestampRequestSettings(name, url, auth, body, proxy, tsQuery, access_token)
+    const tsRequest = await this.getTimestampRequestSettings(name, url, auth, body, proxy, tsQuery, accessToken)
     return await fetch(requestUrl, tsRequest).then(async (response) => {
       if (response.status !== 200) {
         throw new Error(`TSA response unsatisfactory: ${response.status} ${response.statusText}`)
@@ -154,10 +154,10 @@ class TrustedTimestampRequest {
    * @param {string} [proxy]
    * @param {string} [body]
    * @param {string} tsQuery
-   * @param {string} access_token
+   * @param {string} accessToken
    * @return {object}
    **/
-  async getTimestampRequestSettings (name, url, auth, body, proxy, tsQuery, access_token) {
+  async getTimestampRequestSettings (name, url, auth, body, proxy, tsQuery, accessToken) {
     // send the request to the TSA
     const tsRequest = {
       method: 'POST',
@@ -170,7 +170,7 @@ class TrustedTimestampRequest {
       tsRequest.proxy = proxy.url
     }
 
-    if (!access_token) {
+    if (!accessToken) {
       tsRequest.encoding = null // we expect binary data in a buffer: ensure that the response is not decoded unnecessarily
       tsRequest.resolveWithFullResponse = true
 
@@ -179,17 +179,17 @@ class TrustedTimestampRequest {
       }
     }
 
-    if (auth && !access_token) {
+    if (auth && !accessToken) {
       tsRequest.headers = {
         ...tsRequest.headers,
         Authorization: `Basic ${Buffer.from(auth.user + ':' + auth.pass).toString('base64')}`
       }
     }
 
-    if (access_token) {
+    if (accessToken) {
       tsRequest.headers = {
         ...tsRequest.headers,
-        Authorization: `Bearer ${access_token}`
+        Authorization: `Bearer ${accessToken}`
       }
 
       const { tempPath, cleanupCallback } = await this.tempFileService.createTempFile(this.tmpOptions, Buffer.from(tsQuery))
@@ -215,7 +215,7 @@ class TrustedTimestampRequest {
    * @param {string} [proxy]
    * @return {object}
    **/
-  async getOauthRequestSettings(auth, body, proxy) {
+  async getOauthRequestSettings (auth, body, proxy) {
     const tsRequest = {
       method: 'POST'
     }
