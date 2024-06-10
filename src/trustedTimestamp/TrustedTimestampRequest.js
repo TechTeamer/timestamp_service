@@ -28,10 +28,10 @@ class TrustedTimestampRequest {
    * @param {object} tmpOptions
    */
   constructor (providers, tempFileService, tmpOptions) {
-    this.providers = providers
     this.tempFileService = tempFileService
     this.tmpOptions = tmpOptions
     this.cleanupTempFns = []
+    this.providers = this.sortedProviders(providers)
   }
 
   /**
@@ -41,25 +41,24 @@ class TrustedTimestampRequest {
    * @return {Promise<response.body>}
    **/
   async getTimestamp (tsQuery) {
-    let timestampExists = null
+    let timestampToken = null
 
-    for (const provider of this.sortedProviders()) {
-      if (!timestampExists) {
+    for (const provider of this.providers) {
+      if (!timestampToken) {
         const { name, url, auth, body, proxy } = provider
-        if (name && url) {
-          timestampExists = await this.sendTimestampRequest(name, url, auth, body, proxy, tsQuery)
-        } else {
-          if (!name) {
-            throw new Error('Provider name is missing')
-          }
-          if (!url) {
-            throw new Error('Provider url is missing')
-          }
+
+        if (!name) {
+          throw new Error('Provider name is missing')
         }
+        if (!url) {
+          throw new Error('Provider url is missing')
+        }
+
+        timestampToken = await this.sendTimestampRequest(name, url, auth, body, proxy, tsQuery)
       }
     }
 
-    return timestampExists
+    return timestampToken
   }
 
   /**
@@ -67,11 +66,11 @@ class TrustedTimestampRequest {
    *
    * @return array
    **/
-  sortedProviders () {
+  sortedProviders (providers) {
     const priorityProviders = []
     const nonPriorityProviders = []
 
-    this.providers.forEach((provider) => {
+    providers.forEach((provider) => {
       if (provider?.priority) {
         priorityProviders.push(provider)
       } else {

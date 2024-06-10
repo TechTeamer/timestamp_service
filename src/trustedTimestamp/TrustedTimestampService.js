@@ -79,10 +79,6 @@ class TrustedTimestampService {
    * @return {Promise<TimestampInfo>}
    * */
   async getTimestampInfo (tsr, isToken = false) {
-    if (!this.config) {
-      return Promise.reject(new Error('Trusted timestamp is disabled from config'))
-    }
-
     const cleanupTempFns = []
     let inputTempPath = ''
 
@@ -138,16 +134,21 @@ class TrustedTimestampService {
    * The returned timestamp token represents the token
    * and contains the tsr with the verification result.
    *
+   * @typedef {object}  result
+   * @property {string} digest
+   * @property {string} hashAlgorithm
+   * @property {number} dataSize
+   * @property {object} tsr
+   * @property {boolean} isToken
+   * @property {string} certExpiry
+   * @property {boolean | null} verified
+   *
    * @param {String} digest
    * @param {String} hashAlgorithm a valid option that openssl accepts (e.g: 'sha256', 'sha512')
    * @param {Number} dataSize the size of the data the digest is generated from
-   * @return {Promise<object>}
+   * @return {Promise<result>}
    * */
   async createTimestampToken (digest, hashAlgorithm, dataSize) {
-    if (!this.config) {
-      return Promise.resolve(null)
-    }
-
     const digestFormat = normalizeDigestFormat(hashAlgorithm)
 
     try {
@@ -184,26 +185,6 @@ class TrustedTimestampService {
   }
 
   /**
-   * @param {Number} dataSize
-   * @param {Buffer} token
-   * @param {Boolean} [isToken=false]
-   * @param tokenModel token from database
-   * @return {Promise<tokenModel>}
-   */
-  async importTimestampToken (dataSize, token, isToken = false, tokenModel) {
-    try {
-      const timestampInfo = await this.getTimestampInfo(token, isToken)
-      const digest = timestampInfo.hash
-
-      tokenModel.verified = await this.verifyToken(tokenModel, digest, dataSize)
-
-      return tokenModel
-    } catch (err) {
-      throw new Error(`Error importing timestamp token ${err.message}`)
-    }
-  }
-
-  /**
    * Verify if a timestamp token corresponds to a particular hash of data
    *
    * @param timestampToken
@@ -212,10 +193,6 @@ class TrustedTimestampService {
    * @return {Promise<boolean>}
    * */
   async verifyToken (timestampToken, digest, dataSize) {
-    if (!this.config) {
-      return false
-    }
-
     if (timestampToken.dataSize !== dataSize) {
       throw new Error(`Timestamp token verification failed: The provided data size (${dataSize}) does not match the time stamped size (${timestampToken.dataSize}).`)
     }
@@ -236,34 +213,34 @@ class TrustedTimestampService {
    * @param {Boolean} [isToken=false] indicates that whether the input is a timestamp token or response
    * @return {Promise<boolean>}
    * */
-  verifyTsr (digest, tsr, isToken = false) {
+  async verifyTsr(digest, tsr, isToken = false) {
     let cleanupTempFile = null
 
-    return Promise.resolve().then(() => {
+    try {
       if (!checkDigest(digest)) {
         throw new Error(`Invalid digest: ${digest}`)
       }
-    }).then(() => {
+
       // save the tsr on disk because openssl can only read it from file
-      return this.tempFileService.createTempFile(this.tmpOptions, tsr)
-    }).then(({ tempPath, cleanupCallback }) => {
+      const {tempPath, cleanupCallback} = await this.tempFileService.createTempFile(this.tmpOptions, tsr)
+
       cleanupTempFile = cleanupCallback
-      return getTsVerify(digest, tempPath, isToken, this.certsLocation)
-    }).then((stdout) => {
-      return /Verification: OK/i.test(stdout)
-    }).then((verificationResult) => {
+      const stdout = await getTsVerify(digest, tempPath, isToken, this.certsLocation)
+
+      const verificationResult = /Verification: OK/i.test(stdout)
+
       if (cleanupTempFile) {
         cleanupTempFile()
       }
 
       return verificationResult
-    }).catch((err) => {
+    } catch(err) {
       if (cleanupTempFile) {
         cleanupTempFile()
       }
 
       throw new Error(`Failed to verify tsr ${err.message}`)
-    })
+    }
   }
 
   /**
@@ -272,10 +249,6 @@ class TrustedTimestampService {
    * @return {Promise<string>}
    * */
   async testService () {
-    if (!this.config) {
-      return Promise.resolve()
-    }
-
     return await checkSslPath()
   }
 }
