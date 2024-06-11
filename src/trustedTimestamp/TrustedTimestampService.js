@@ -3,7 +3,7 @@ const TrustedTimestampRequest = require('./TrustedTimestampRequest')
 const { getTsQuery, getTsVerify, getTsReply, generateTsReply, extractCertFromToken, checkSslPath } = require('./TrustedTimestampCommand')
 const { normalizeDigestFormat, checkDigestFormat, checkDigest } = require('./TrustedTimestampCheck')
 const TempFileService = require('../util/TempFileService')
-const CertService = require('../util/CertService')
+const CertService = require('@techteamer/cert-service')
 
 /**
  * OpenSSL docs: https://www.openssl.org/docs/manmaster/man1/ts.html
@@ -64,7 +64,6 @@ class TrustedTimestampService {
 
       this.tempFileService = new TempFileService()
       this.certService = new CertService(this.encoding)
-
       this.providers = this.config.providers
       this.certsLocation = this.config.certsLocation
       this.timestampRequest = new TrustedTimestampRequest(this.providers, this.tempFileService, this.tmpOptions)
@@ -213,7 +212,7 @@ class TrustedTimestampService {
    * @param {Boolean} [isToken=false] indicates that whether the input is a timestamp token or response
    * @return {Promise<boolean>}
    * */
-  async verifyTsr(digest, tsr, isToken = false) {
+  async verifyTsr (digest, tsr, isToken = false) {
     let cleanupTempFile = null
 
     try {
@@ -222,21 +221,20 @@ class TrustedTimestampService {
       }
 
       // save the tsr on disk because openssl can only read it from file
-      const {tempPath, cleanupCallback} = await this.tempFileService.createTempFile(this.tmpOptions, tsr)
+      const { tempPath, cleanupCallback } = await this.tempFileService.createTempFile(this.tmpOptions, tsr)
 
-      cleanupTempFile = cleanupCallback
       const stdout = await getTsVerify(digest, tempPath, isToken, this.certsLocation)
 
       const verificationResult = /Verification: OK/i.test(stdout)
 
-      if (cleanupTempFile) {
-        cleanupTempFile()
+      if (cleanupCallback) {
+        cleanupCallback()
       }
 
       return verificationResult
-    } catch(err) {
-      if (cleanupTempFile) {
-        cleanupTempFile()
+    } catch (err) {
+      if (cleanupCallback) {
+        cleanupCallback()
       }
 
       throw new Error(`Failed to verify tsr ${err.message}`)

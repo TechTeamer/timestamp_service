@@ -28,7 +28,8 @@ jest.mock('../../../src/trustedTimestamp/TrustedTimestampCommand.js', () => ({
   checkSslPath: jest.fn().mockResolvedValue('/usr/bin/openssl'),
 }))
 
-jest.mock('../../../src/util/CertService.js', () => {
+
+jest.mock('@techteamer/cert-service', () => {
   return jest.fn().mockImplementation(() => ({
     get CertType () {
       return {

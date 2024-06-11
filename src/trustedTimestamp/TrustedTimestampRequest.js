@@ -31,7 +31,7 @@ class TrustedTimestampRequest {
     this.tempFileService = tempFileService
     this.tmpOptions = tmpOptions
     this.cleanupTempFns = []
-    this.providers = this.sortedProviders(providers)
+    this.providers = this._sortedProviders(providers)
   }
 
   /**
@@ -54,7 +54,7 @@ class TrustedTimestampRequest {
           throw new Error('Provider url is missing')
         }
 
-        timestampToken = await this.sendTimestampRequest(name, url, auth, body, proxy, tsQuery)
+        timestampToken = await this._sendTimestampRequest(name, url, auth, body, proxy, tsQuery)
       }
     }
 
@@ -65,8 +65,9 @@ class TrustedTimestampRequest {
    * sortedProviders method that sorting the providers according to priority
    *
    * @return array
+   * @Private
    **/
-  sortedProviders (providers) {
+  _sortedProviders (providers) {
     const priorityProviders = []
     const nonPriorityProviders = []
 
@@ -84,11 +85,14 @@ class TrustedTimestampRequest {
   }
 
   /**
-   * sendTimestampRequest method that calls the provider
-   *
    * @typedef {object}  urlObject
    * @property {string} getTokenUrl
    * @property {string} getTimestampUrl
+   *
+   **/
+
+  /**
+   * sendTimestampRequest method that calls the provider
    *
    * @param {string} name
    * @param {string| urlObject} url
@@ -97,19 +101,20 @@ class TrustedTimestampRequest {
    * @param {string} [body]
    * @param {string} tsQuery
    * @return {Promise<Buffer>}
+   * @Private
    **/
-  async sendTimestampRequest (name, url, auth, body, proxy, tsQuery) {
+  async _sendTimestampRequest (name, url, auth, body, proxy, tsQuery) {
     let accessToken
     let requestUrl
     if (url?.getTokenUrl && url?.getTimestampUrl) {
-      const oauth = await this.getOauth(name, url.getTokenUrl, auth, body, proxy)
+      const oauth = await this._getOauth(name, url.getTokenUrl, auth, body, proxy)
       accessToken = oauth?.access_token
       requestUrl = url.getTimestampUrl
     } else {
       requestUrl = url
     }
 
-    const tsRequest = await this.getTimestampRequestSettings(name, url, auth, body, proxy, tsQuery, accessToken)
+    const tsRequest = await this._getTimestampRequestSettings(name, url, auth, body, proxy, tsQuery, accessToken)
     return await fetch(requestUrl, tsRequest).then(async (response) => {
       if (response.status !== 200) {
         throw new Error(`TSA response unsatisfactory: ${response.status} ${response.statusText}`)
@@ -136,9 +141,10 @@ class TrustedTimestampRequest {
    * @param {object} body
    * @param {string} [proxy]
    * @return {object}
+   * @Private
    **/
-  async getOauth (name, url, auth, body, proxy) {
-    const tsRequest = await this.getOauthRequestSettings(auth, body, proxy)
+  async _getOauth (name, url, auth, body, proxy) {
+    const tsRequest = await this._getOauthRequestSettings(auth, body, proxy)
     return await fetch(url, tsRequest).then(async (response) => {
       return await response.json()
     })
@@ -155,8 +161,9 @@ class TrustedTimestampRequest {
    * @param {string} tsQuery
    * @param {string} accessToken
    * @return {object}
+   * @Private
    **/
-  async getTimestampRequestSettings (name, url, auth, body, proxy, tsQuery, accessToken) {
+  async _getTimestampRequestSettings (name, url, auth, body, proxy, tsQuery, accessToken) {
     // send the request to the TSA
     const tsRequest = {
       method: 'POST',
@@ -213,8 +220,9 @@ class TrustedTimestampRequest {
    * @param {object} body
    * @param {string} [proxy]
    * @return {object}
+   * @Private
    **/
-  async getOauthRequestSettings (auth, body, proxy) {
+  async _getOauthRequestSettings (auth, body, proxy) {
     const tsRequest = {
       method: 'POST'
     }

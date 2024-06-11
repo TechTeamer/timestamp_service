@@ -1,7 +1,7 @@
 Timestamp
 =============
 
-Trustedtimestamp service implements the generate, import and verification of timestamps.
+Trustedtimestamp service implements the generate and verification of timestamps.
 
 * [Install](#install)
 * [Usage](#usage)
@@ -104,7 +104,6 @@ this.trustedTimestampService = new TrustedTimestampServiceLib('normal', config.g
 
 - `getTimestampInfo`
 - `createTimestampToken`
-- `importTimestampToken`
 - `verifyToken`
 - `verifyTsr`
 - `testService`
