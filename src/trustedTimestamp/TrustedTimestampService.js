@@ -3,7 +3,7 @@ const TrustedTimestampRequest = require('./TrustedTimestampRequest')
 const { getTsQuery, getTsVerify, getTsReply, generateTsReply, extractCertFromToken, checkSslPath } = require('./TrustedTimestampCommand')
 const { normalizeDigestFormat, checkDigestFormat, checkDigest } = require('./TrustedTimestampCheck')
 const TempFileService = require('../util/TempFileService')
-const CertService = require('@techteamer/cert-service')
+const { CertService } = require('@techteamer/cert-service')
 
 /**
  * OpenSSL docs: https://www.openssl.org/docs/manmaster/man1/ts.html
@@ -63,7 +63,7 @@ class TrustedTimestampService {
       }
 
       this.tempFileService = new TempFileService()
-      this.certService = new CertService(this.encoding)
+      this.certService = new CertService(this.config)
       this.providers = this.config.providers
       this.certsLocation = this.config.certsLocation
       this.timestampRequest = new TrustedTimestampRequest(this.providers, this.tempFileService, this.tmpOptions)
@@ -222,19 +222,20 @@ class TrustedTimestampService {
 
       // save the tsr on disk because openssl can only read it from file
       const { tempPath, cleanupCallback } = await this.tempFileService.createTempFile(this.tmpOptions, tsr)
+      cleanupTempFile = cleanupCallback
 
       const stdout = await getTsVerify(digest, tempPath, isToken, this.certsLocation)
 
       const verificationResult = /Verification: OK/i.test(stdout)
 
-      if (cleanupCallback) {
-        cleanupCallback()
+      if (cleanupTempFile) {
+        cleanupTempFile()
       }
 
       return verificationResult
     } catch (err) {
-      if (cleanupCallback) {
-        cleanupCallback()
+      if (cleanupTempFile) {
+        cleanupTempFile()
       }
 
       throw new Error(`Failed to verify tsr ${err.message}`)
