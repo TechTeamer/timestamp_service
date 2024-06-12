@@ -42,15 +42,16 @@ class TrustedTimestampService {
     this.timestampInfoType = timestampInfoType
     this.config = config
     this.encoding = encoding
-    this.init()
+    this._init()
   }
 
   /**
    * init method that sets the config and instantiates the required services
    *
    * @return void
+   * @private
    * */
-  init () {
+  _init () {
     this.tmpOptions = { prefix: 'request-', postfix: '.tsr' }
 
     if (this.config) {
@@ -63,7 +64,7 @@ class TrustedTimestampService {
       }
 
       this.tempFileService = new TempFileService()
-      this.certUtils = new CertUtils(this.config)
+      this.certUtils = new CertUtils(this.encoding)
       this.providers = this.config.providers
       this.certsLocation = this.config.certsLocation
       this.timestampRequest = new TrustedTimestampRequest(this.providers, this.tempFileService, this.tmpOptions)
