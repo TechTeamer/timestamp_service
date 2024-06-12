@@ -29,7 +29,7 @@ jest.mock('../../../src/trustedTimestamp/TrustedTimestampCommand.js', () => ({
 }))
 
 
-jest.mock('@techteamer/cert-service', () => {
+jest.mock('@techteamer/cert-utils', () => {
   return jest.fn().mockImplementation(() => ({
     get CertType () {
       return {

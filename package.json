@@ -21,7 +21,7 @@
     "test": "npm run lint --silent && echo 'npm test: OK'"
   },
   "dependencies": {
-    "@techteamer/cert-service": "^1.0.0",
+    "@techteamer/cert-utils": "^1.0.0",
     "fs-extra": "^11.1.1",
     "jest": "^29.7.0",
     "node-fetch": "^2.7.0",
