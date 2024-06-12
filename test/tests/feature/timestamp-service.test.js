@@ -165,9 +165,10 @@ describe('TrustedTimestampService.js (feature-test)', () => {
         .reply(200, { })
       scope.persist(false)
 
-      const result = await trustedTimestampServiceInstance.createTimestampToken(digest, hashAlgorithm, dataSize)
-      await expect(result).not.toBe(null)
-      await expect(result.verified).toBe(true)
+      const { timestamp, providerName} = await trustedTimestampServiceInstance.createTimestampToken(digest, hashAlgorithm, dataSize)
+      await expect(providerName).not.toBe(null)
+      await expect(timestamp).not.toBe(null)
+      await expect(timestamp.verified).toBe(true)
     })
 
     it('success test - createTimestampToken - create ok oauth', async () => {
@@ -206,9 +207,10 @@ describe('TrustedTimestampService.js (feature-test)', () => {
         .reply(200, { access_token: 'f1d44c9a9f3c6f12536f46e8f06cbe3001954e9e684ccabb99dd36ca296f7bd0' })
       scope2.persist(false)
 
-      const result = await trustedTimestampServiceInstance.createTimestampToken(digest, hashAlgorithm, dataSize)
-      await expect(result).not.toBe(null)
-      await expect(result.verified).toBe(true)
+      const { timestamp, providerName} = await trustedTimestampServiceInstance.createTimestampToken(digest, hashAlgorithm, dataSize)
+      await expect(providerName).not.toBe(null)
+      await expect(timestamp).not.toBe(null)
+      await expect(timestamp.verified).toBe(true)
     })
 
     it('success test - createTimestampToken - create ok wrong provider use next provider', async () => {
@@ -255,9 +257,10 @@ describe('TrustedTimestampService.js (feature-test)', () => {
         .reply(200, { })
       scope2.persist(false)
 
-      const result = await trustedTimestampServiceInstance.createTimestampToken(digest, hashAlgorithm, dataSize)
-      await expect(result).not.toBe(null)
-      await expect(result.verified).toBe(true)
+      const { timestamp, providerName} = await trustedTimestampServiceInstance.createTimestampToken(digest, hashAlgorithm, dataSize)
+      await expect(providerName).not.toBe(null)
+      await expect(timestamp).not.toBe(null)
+      await expect(timestamp.verified).toBe(true)
     })
   })
 

@@ -37,11 +37,16 @@ class TrustedTimestampRequest {
   /**
    * getTimestamp method that calls the service providers in sequence, requesting a timestamp
    *
+   * @typedef {object}  result
+   * @property {Buffer} tsr
+   * @property {string} providerName
+   *
    * @param {string} tsQuery
-   * @return {Promise<response.body>}
+   * @return {Promise<result>}
    **/
   async getTimestamp (tsQuery) {
     let timestampToken = null
+    let providerName = ''
 
     for (const provider of this.providers) {
       if (!timestampToken) {
@@ -55,10 +60,11 @@ class TrustedTimestampRequest {
         }
 
         timestampToken = await this._sendTimestampRequest(name, url, auth, body, proxy, tsQuery)
+        providerName = name
       }
     }
 
-    return timestampToken
+    return { tsr: timestampToken, providerName }
   }
 
   /**

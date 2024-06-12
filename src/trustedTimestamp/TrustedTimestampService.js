@@ -135,6 +135,10 @@ class TrustedTimestampService {
    * and contains the tsr with the verification result.
    *
    * @typedef {object}  result
+   * @property {object} timestamp
+   * @property {string} providerName
+   *
+   * @typedef {object}  timestamp
    * @property {string} digest
    * @property {string} hashAlgorithm
    * @property {number} dataSize
@@ -160,7 +164,7 @@ class TrustedTimestampService {
       }
 
       const tsQuery = await getTsQuery(digest, digestFormat)
-      const tsr = await this.timestampRequest.getTimestamp(tsQuery)
+      const { tsr, providerName } = await this.timestampRequest.getTimestamp(tsQuery)
       if (!tsr) {
         throw new Error('Failed to create trusted timestamp, no provider was available')
       }
@@ -178,7 +182,7 @@ class TrustedTimestampService {
 
       tt.verified = await this.verifyToken(tt, digest, dataSize)
 
-      return tt
+      return { timestamp: tt, providerName }
     } catch (err) {
       throw new Error(`Failed to create trusted timestamp ${err.message}`)
     }
