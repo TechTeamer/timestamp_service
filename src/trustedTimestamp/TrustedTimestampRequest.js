@@ -27,7 +27,7 @@ class TrustedTimestampRequest {
    * @param tempFileService
    * @param {object} tmpOptions
    */
-  constructor (providers, tempFileService, tmpOptions) {
+  constructor(providers, tempFileService, tmpOptions) {
     this.tempFileService = tempFileService
     this.tmpOptions = tmpOptions
     this.cleanupTempFns = []
@@ -59,7 +59,7 @@ class TrustedTimestampRequest {
           throw new Error('Provider url is missing')
         }
 
-        timestampToken = await this._sendTimestampRequest(name, url, auth, body, proxy, tsQuery)
+        timestampToken = await this._getTimeStampToken(url, auth, body, proxy, tsQuery)
         providerName = name
       }
     }
@@ -100,7 +100,6 @@ class TrustedTimestampRequest {
   /**
    * sendTimestampRequest method that calls the provider
    *
-   * @param {string} name
    * @param {string| urlObject} url
    * @param {string} [auth]
    * @param {string} [proxy]
@@ -109,18 +108,8 @@ class TrustedTimestampRequest {
    * @return {Promise<Buffer>}
    * @Private
    **/
-  async _sendTimestampRequest (name, url, auth, body, proxy, tsQuery) {
-    let accessToken
-    let requestUrl
-    if (url?.getTokenUrl && url?.getTimestampUrl) {
-      const oauth = await this._getOauth(name, url.getTokenUrl, auth, body, proxy)
-      accessToken = oauth?.access_token
-      requestUrl = url.getTimestampUrl
-    } else {
-      requestUrl = url
-    }
-
-    const tsRequest = await this._getTimestampRequestSettings(name, url, auth, body, proxy, tsQuery, accessToken)
+  async _getTimeStampToken (url, auth, body, proxy, tsQuery) {
+    const { requestUrl, tsRequest } = await this._getTimestampRequest(url, body, auth, proxy, tsQuery)
     return await fetch(requestUrl, tsRequest).then(async (response) => {
       if (response.status !== 200) {
         throw new Error(`TSA response unsatisfactory: ${response.status} ${response.statusText}`)
@@ -141,7 +130,6 @@ class TrustedTimestampRequest {
   /**
    * getOauth method that get oauth access_token
    *
-   * @param {string} name
    * @param {string} url
    * @param {object} auth
    * @param {object} body
@@ -149,33 +137,57 @@ class TrustedTimestampRequest {
    * @return {object}
    * @Private
    **/
-  async _getOauth (name, url, auth, body, proxy) {
+  async _getOauth (url, auth, body, proxy) {
     const tsRequest = await this._getOauthRequestSettings(auth, body, proxy)
-    return await fetch(url, tsRequest).then(async (response) => {
-      return await response.json()
+    return await fetch(url, tsRequest).then((response) => {
+      return response.json()
+    }).catch((err) => {
+      return {
+        error: {
+          message: err.message
+        }
+      }
     })
   }
 
   /**
    * getTimestampRequestSettings method that set the request settings
    *
-   * @param {string} name
-   * @param {object | string} url
+   * @param {string} [url]
+   * @param {string} [body]
    * @param {string} [auth]
    * @param {string} [proxy]
    * @param {string} [body]
    * @param {string} tsQuery
-   * @param {string} accessToken
    * @return {object}
    * @Private
    **/
-  async _getTimestampRequestSettings (name, url, auth, body, proxy, tsQuery, accessToken) {
+  async _getTimestampRequest (url, body, auth, proxy, tsQuery) {
     // send the request to the TSA
     const tsRequest = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/timestamp-query'
       }
+    }
+
+    // create: tsRequst
+    // strategy: oauth, basic, noAuth
+    // set tsRequest url, header, body
+    // return
+
+    let accessToken
+    let requestUrl
+
+    if (url?.getTokenUrl && url?.getTimestampUrl) {
+      const oauth = await this._getOauth(url.getTokenUrl, auth, body, proxy)
+      if (!oauth?.access_token) {
+        // skip
+      }
+      accessToken = oauth?.access_token
+      requestUrl = url.getTimestampUrl
+    } else {
+      requestUrl = url
     }
 
     if (proxy && proxy?.url) {
@@ -216,7 +228,7 @@ class TrustedTimestampRequest {
       }
     }
 
-    return tsRequest
+    return { requestUrl, tsRequest }
   }
 
   /**

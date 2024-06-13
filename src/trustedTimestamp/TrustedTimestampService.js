@@ -239,7 +239,7 @@ class TrustedTimestampService {
 
       return verificationResult
     } catch (err) {
-      if (cleanupTempFile) {
+      if (typeof cleanupTempFile === 'function') {
         cleanupTempFile()
       }
 
