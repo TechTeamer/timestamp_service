@@ -1,5 +1,5 @@
 const fetch = require('node-fetch')
-const fs = require('fs')
+const TimestampRequest = require('./TimestampRequest')
 
 /**
 * TrustedTimestampRequest service implements timestamp request and sorted providers
@@ -128,32 +128,9 @@ class TrustedTimestampRequest {
   }
 
   /**
-   * getOauth method that get oauth access_token
-   *
-   * @param {string} url
-   * @param {object} auth
-   * @param {object} body
-   * @param {string} [proxy]
-   * @return {object}
-   * @Private
-   **/
-  async _getOauth (url, auth, body, proxy) {
-    const tsRequest = await this._getOauthRequestSettings(auth, body, proxy)
-    return await fetch(url, tsRequest).then((response) => {
-      return response.json()
-    }).catch((err) => {
-      return {
-        error: {
-          message: err.message
-        }
-      }
-    })
-  }
-
-  /**
    * getTimestampRequestSettings method that set the request settings
    *
-   * @param {string} [url]
+   * @param {object | string} url
    * @param {string} [body]
    * @param {string} [auth]
    * @param {string} [proxy]
@@ -164,99 +141,24 @@ class TrustedTimestampRequest {
    **/
   async _getTimestampRequest (url, body, auth, proxy, tsQuery) {
     // send the request to the TSA
-    const tsRequest = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/timestamp-query'
-      }
-    }
-
-    // create: tsRequst
-    // strategy: oauth, basic, noAuth
-    // set tsRequest url, header, body
-    // return
-
-    let accessToken
-    let requestUrl
-
-    if (url?.getTokenUrl && url?.getTimestampUrl) {
-      const oauth = await this._getOauth(url.getTokenUrl, auth, body, proxy)
-      if (!oauth?.access_token) {
-        // skip
-      }
-      accessToken = oauth?.access_token
-      requestUrl = url.getTimestampUrl
-    } else {
-      requestUrl = url
-    }
+    const tsRequest = new TimestampRequest(this.tempFileService, this.tmpOptions, this.cleanupTempFns)
 
     if (proxy && proxy?.url) {
-      tsRequest.proxy = proxy.url
+      tsRequest.setProxy(proxy.url)
     }
 
-    if (!accessToken) {
-      tsRequest.encoding = null // we expect binary data in a buffer: ensure that the response is not decoded unnecessarily
-      tsRequest.resolveWithFullResponse = true
-
-      if (tsQuery) {
-        tsRequest.body = tsQuery
-      }
+    let requestType
+    if (url?.getTokenUrl && tsQuery) {
+      requestType = 'oauth'
+    }
+    if (!url?.getTokenUrl && auth?.user && auth?.pass && tsQuery) {
+      requestType = 'basic'
+    }
+    if (!url?.getTokenUrl && !auth?.user) {
+      requestType = 'noAuth'
     }
 
-    if (auth && !accessToken) {
-      tsRequest.headers = {
-        ...tsRequest.headers,
-        Authorization: `Basic ${Buffer.from(auth.user + ':' + auth.pass).toString('base64')}`
-      }
-    }
-
-    if (accessToken) {
-      tsRequest.headers = {
-        ...tsRequest.headers,
-        Authorization: `Bearer ${accessToken}`
-      }
-
-      const { tempPath, cleanupCallback } = await this.tempFileService.createTempFile(this.tmpOptions, Buffer.from(tsQuery))
-      this.cleanupTempFns.push(cleanupCallback)
-
-      const stats = fs.statSync(tempPath)
-      const fileSizeInBytes = stats.size
-      tsRequest.body = fs.createReadStream(tempPath)
-      tsRequest.headers = {
-        ...tsRequest.headers,
-        'Content-length': fileSizeInBytes
-      }
-    }
-
-    return { requestUrl, tsRequest }
-  }
-
-  /**
-   * getOauthRequestSettings method that set the request oath settings
-   *
-   * @param {object} auth
-   * @param {object} body
-   * @param {string} [proxy]
-   * @return {object}
-   * @Private
-   **/
-  async _getOauthRequestSettings (auth, body, proxy) {
-    const tsRequest = {
-      method: 'POST'
-    }
-
-    tsRequest.headers = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Basic ${Buffer.from(auth.user + ':' + auth.pass).toString('base64')}`
-    }
-
-    tsRequest.body = new URLSearchParams(body)
-
-    if (proxy && proxy?.url) {
-      tsRequest.proxy = proxy.url
-    }
-
-    return tsRequest
+    return await tsRequest.strategy(requestType, url, auth, body, proxy, tsQuery)
   }
 }
 
