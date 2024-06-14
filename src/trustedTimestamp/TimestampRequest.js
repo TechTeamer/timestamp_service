@@ -32,7 +32,7 @@ class TimestampRequest {
   setHeader (headers) {
     this.tsRequest = {
       ...this.tsRequest,
-      headers: headers
+      headers
     }
   }
 
@@ -56,7 +56,7 @@ class TimestampRequest {
    * set request encoding
    * @param {string} encoding
    * */
-  setEncoding(encoding) {
+  setEncoding (encoding) {
     this.tsRequest.encoding = encoding
   }
 
@@ -77,7 +77,7 @@ class TimestampRequest {
   }
 
   /**
-   * strategy method that set no auth request
+   * authStrategy method that set no auth request
    * @param requestType
    * @param {object | string} url
    * @param {object} [auth]
@@ -86,7 +86,7 @@ class TimestampRequest {
    * @param {string} tsQuery
    * @return {object}
    * */
-  async strategy(requestType, url, auth, body, proxy, tsQuery) {
+  async authStrategy (requestType, url, auth, body, proxy, tsQuery) {
     switch (requestType) {
       case 'basic':
         return this._getTimestampRequestBasic(url, auth, tsQuery)
@@ -100,14 +100,14 @@ class TimestampRequest {
   }
 
   /**
-   * _getTimestampRequestBasic method that set no auth request
+   * _getTimestampRequestBasic method that set basic auth request
    * @param {object | string} url
    * @param {object} [auth]
    * @param {string} tsQuery
    * @return {object}
    * @Private
    * */
-  _getTimestampRequestBasic(url, auth, tsQuery){
+  _getTimestampRequestBasic (url, auth, tsQuery) {
     this.setHeader({
       ...this.tsRequest.headers,
       Authorization: `Basic ${Buffer.from(auth.user + ':' + auth.pass).toString('base64')}`
@@ -121,7 +121,7 @@ class TimestampRequest {
   }
 
   /**
-   * _getTimestampRequestOauth method that set no auth request
+   * _getTimestampRequestOauth method that set oauth request
    * @param {object | string} url
    * @param {object} [auth]
    * @param {object} [body]
@@ -130,13 +130,13 @@ class TimestampRequest {
    * @return {object}
    * @Private
    * */
-  async _getTimestampRequestOauth(url, auth, body, proxy, tsQuery) {
-    let accessToken
+  async _getTimestampRequestOauth (url, auth, body, proxy, tsQuery) {
     const oauth = await this._getOauth(url.getTokenUrl, auth, body, proxy)
     if (!oauth?.access_token) {
       return { requestUrl: null, tsRequest: null }
     }
-    accessToken = oauth?.access_token
+
+    const accessToken = oauth?.access_token
 
     if (accessToken) {
       this.setHeader({
@@ -168,7 +168,7 @@ class TimestampRequest {
    * @return {object}
    * @Private
    * */
-  _getTimestampRequestNoAuth(url){
+  _getTimestampRequestNoAuth (url) {
     return { requestUrl: url, tsRequest: this.get() }
   }
 

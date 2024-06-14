@@ -27,7 +27,7 @@ class TrustedTimestampRequest {
    * @param tempFileService
    * @param {object} tmpOptions
    */
-  constructor(providers, tempFileService, tmpOptions) {
+  constructor (providers, tempFileService, tmpOptions) {
     this.tempFileService = tempFileService
     this.tmpOptions = tmpOptions
     this.cleanupTempFns = []
@@ -158,7 +158,7 @@ class TrustedTimestampRequest {
       requestType = 'noAuth'
     }
 
-    return await tsRequest.strategy(requestType, url, auth, body, proxy, tsQuery)
+    return await tsRequest.authStrategy(requestType, url, auth, body, proxy, tsQuery)
   }
 }
 
