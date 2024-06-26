@@ -3,7 +3,7 @@ const TrustedTimestampRequest = require('./TrustedTimestampRequest')
 const { getTsQuery, getTsVerify, getTsReply, generateTsReply, extractCertFromToken, checkSslPath } = require('./TrustedTimestampCommand')
 const { normalizeDigestFormat, checkDigestFormat, checkDigest } = require('./TrustedTimestampCheck')
 const TempFileService = require('../util/TempFileService')
-const CertUtils = require('@techteamer/cert-utils')
+const { CertService } = require('@techteamer/cert-utils')
 
 /**
  * OpenSSL docs: https://www.openssl.org/docs/manmaster/man1/ts.html
@@ -64,7 +64,7 @@ class TrustedTimestampService {
       }
 
       this.tempFileService = new TempFileService()
-      this.certUtils = new CertUtils(this.encoding)
+      this.certService = new CertService(this.encoding)
       this.providers = this.config.providers
       this.certsLocation = this.config.certsLocation
       this.timestampRequest = new TrustedTimestampRequest(this.providers, this.tempFileService, this.tmpOptions)
@@ -107,7 +107,7 @@ class TrustedTimestampService {
         // extract cert from token
         const x509Cert = await extractCertFromToken(tstPath)
         // parse cert
-        const certInfo = await this.certUtils.parseCert(Buffer.from(x509Cert), '', this.certUtils.CertType.PEM)
+        const certInfo = await this.certService.parseCert(Buffer.from(x509Cert), '', this.certService.CertType.PEM)
 
         if (this.timestampInfoType === 'normal') {
           timestampInfo.setCertInfo(certInfo)

@@ -1,6 +1,6 @@
 {
   "name": "@techteamer/timestamp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This package contains a TimestampService, which can create and verity timestamps",
   "main": "index.js",
   "author": "Techteamer",
@@ -19,7 +19,7 @@
     "test": "npm run lint --silent && echo 'npm test: OK'"
   },
   "dependencies": {
-    "@techteamer/cert-utils": "^1.0.0",
+    "@techteamer/cert-utils": "^1.1.1",
     "fs-extra": "^11.1.1",
     "node-fetch": "^2.7.0",
     "tmp": "^0.2.1",
