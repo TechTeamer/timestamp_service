@@ -37,19 +37,21 @@ class TrustedTimestampRequest {
   /**
    * getTimestamp method that calls the service providers in sequence, requesting a timestamp
    *
-   * @typedef {object}  result
+   * @typedef {returnObject}  result
    * @property {Buffer} tsr
    * @property {string} providerName
+   * @property {array} logHistory
    *
    * @param {string} tsQuery
-   * @return {Promise<result>}
+   * @return {returnObject}
    **/
   async getTimestamp (tsQuery) {
-    let timestampToken = null
+    let tsr = null
     let providerName = ''
+    const logHistory = []
 
     for (const provider of this.providers) {
-      if (!timestampToken) {
+      if (!tsr) {
         const { name, url, auth, body, proxy } = provider
 
         if (!name) {
@@ -59,12 +61,14 @@ class TrustedTimestampRequest {
           throw new Error('Provider url is missing')
         }
 
-        timestampToken = await this._getTimeStampToken(url, auth, body, proxy, tsQuery)
+        const { timestampToken, log } = await this._getTimeStampToken(name, url, auth, body, proxy, tsQuery)
+        logHistory.push(log)
+        tsr = timestampToken
         providerName = name
       }
     }
 
-    return { tsr: timestampToken, providerName }
+    return { tsr, providerName, logHistory }
   }
 
   /**
@@ -95,29 +99,48 @@ class TrustedTimestampRequest {
    * @property {string} getTokenUrl
    * @property {string} getTimestampUrl
    *
+   * @typedef {object}  returnObject
+   * @property {Promise<Buffer>} timestampToken
+   * @property {logObject} log
+   *
+   * @typedef {object}  logObject
+   * @property {infoObject} info
+   * @property {object} errorTrace
+   *
+   * @typedef {object}  infoObject
+   * @property {string} name
+   * @property {string} info
+   * @property {string} date
+   * @property {urlObject} url
+   * @property {string} response
+   * @property {string} error
    **/
 
   /**
    * sendTimestampRequest method that calls the provider
    *
+   * @param {string} name - provider name
    * @param {string| urlObject} url
    * @param {string} [auth]
    * @param {string} [proxy]
    * @param {string} [body]
    * @param {string} tsQuery
-   * @return {Promise<Buffer>}
+   * @return {returnObject}
    * @Private
    **/
-  async _getTimeStampToken (url, auth, body, proxy, tsQuery) {
-    const { requestUrl, tsRequest } = await this._getTimestampRequest(url, body, auth, proxy, tsQuery)
+  async _getTimeStampToken (name, url, auth, body, proxy, tsQuery) {
+    const { requestUrl, tsRequest, error } = await this._getTimestampRequest(url, body, auth, proxy, tsQuery)
+    if (error) {
+      return { timestampToken: null, log: { info: { name, info: null, date: new Date(), url, response: null, error: error?.message }, errorTrace: error?.trace } }
+    }
     return await fetch(requestUrl, tsRequest).then(async (response) => {
       if (response.status !== 200) {
         throw new Error(`TSA response unsatisfactory: ${response.status} ${response.statusText}`)
       }
 
-      return Buffer.from(await response.arrayBuffer(), 'utf8')
-    }).catch(() => {
-      // nothing to do
+      return { timestampToken: Buffer.from(await response.arrayBuffer(), 'utf8'), log: { info: { name, date: new Date(), url, response: `${response.status}, ${response.statusText}`, error: null }, errorTrace: null } }
+    }).catch((err) => {
+      return { timestampToken: null, log: { info: { name, date: new Date(), url, reponse: null, error: err.message }, errorTrace: err } }
     }).finally(() => {
       for (const cleanUpFn of this.cleanupTempFns) {
         if (typeof cleanUpFn === 'function') {
@@ -128,6 +151,14 @@ class TrustedTimestampRequest {
   }
 
   /**
+   * @typedef {object}  resultObject
+   * @property {string} requestUrl
+   * @property {string} tsRequest
+   * @property {string} error
+   *
+   **/
+
+  /**
    * getTimestampRequestSettings method that set the request settings
    *
    * @param {object | string} url
@@ -136,7 +167,7 @@ class TrustedTimestampRequest {
    * @param {string} [proxy]
    * @param {string} [body]
    * @param {string} tsQuery
-   * @return {object}
+   * @return {resultObject}
    * @Private
    **/
   async _getTimestampRequest (url, body, auth, proxy, tsQuery) {

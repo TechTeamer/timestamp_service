@@ -147,10 +147,15 @@ class TrustedTimestampService {
    * @property {string} certExpiry
    * @property {boolean | null} verified
    *
+   * @typedef {returnObject}  result
+   * @property {Promise<result>} timestamp
+   * @property {string} providerName
+   * @property {array} logHistory
+   *
    * @param {String} digest
    * @param {String} hashAlgorithm a valid option that openssl accepts (e.g: 'sha256', 'sha512')
    * @param {Number} dataSize the size of the data the digest is generated from
-   * @return {Promise<result>}
+   * @return {returnObject}
    * */
   async createTimestampToken (digest, hashAlgorithm, dataSize) {
     const digestFormat = normalizeDigestFormat(hashAlgorithm)
@@ -164,7 +169,7 @@ class TrustedTimestampService {
       }
 
       const tsQuery = await getTsQuery(digest, digestFormat)
-      const { tsr, providerName } = await this.timestampRequest.getTimestamp(tsQuery)
+      const { tsr, providerName, logHistory } = await this.timestampRequest.getTimestamp(tsQuery)
       if (!tsr) {
         throw new Error('Failed to create trusted timestamp, no provider was available')
       }
@@ -182,7 +187,7 @@ class TrustedTimestampService {
 
       tt.verified = await this.verifyToken(tt, digest, dataSize)
 
-      return { timestamp: tt, providerName }
+      return { timestamp: tt, providerName, logHistory }
     } catch (err) {
       throw new Error(`Failed to create trusted timestamp ${err.message}`)
     }
