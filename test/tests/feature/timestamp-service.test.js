@@ -1,4 +1,5 @@
 const nock = require('nock')
+const { CertService } = require("@techteamer/cert-utils");
 
 const mockResult = 'TST info\n' +
     'Version: 1\n' +
@@ -28,9 +29,8 @@ jest.mock('../../../src/trustedTimestamp/TrustedTimestampCommand.js', () => ({
   checkSslPath: jest.fn().mockResolvedValue('/usr/bin/openssl'),
 }))
 
-
-jest.mock('@techteamer/cert-utils', () => {
-  return jest.fn().mockImplementation(() => ({
+jest.mock('@techteamer/cert-utils', () => ({
+  CertService: jest.fn().mockImplementation(() => ({
     get CertType () {
       return {
         P12: 'P12',
@@ -39,7 +39,7 @@ jest.mock('@techteamer/cert-utils', () => {
     },
     parseCert: () => {}
   }))
-})
+}))
 
 describe('TrustedTimestampService.js (feature-test)', () => {
   // Mocks
