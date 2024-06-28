@@ -131,12 +131,16 @@ class TimestampRequest {
    * @Private
    * */
   async _getTimestampRequestOauth (url, auth, body, proxy, tsQuery) {
-    const oauth = await this._getOauth(url.getTokenUrl, auth, body, proxy)
-    if (!oauth?.access_token) {
-      return { requestUrl: null, tsRequest: null }
+    const oauthResult = await this._getOauth(url.getTokenUrl, auth, body, proxy)
+    if (!oauthResult?.access_token) {
+      return { requestUrl: null, tsRequest: null, error: null }
     }
 
-    const accessToken = oauth?.access_token
+    if (oauthResult?.error) {
+      return { requestUrl: null, tsRequest: null, error: oauthResult?.error }
+    }
+
+    const accessToken = oauthResult?.access_token
 
     if (accessToken) {
       this.setHeader({
@@ -159,7 +163,7 @@ class TimestampRequest {
       })
     }
 
-    return { requestUrl: url?.getTimestampUrl, tsRequest: this.get() }
+    return { requestUrl: url?.getTimestampUrl, tsRequest: this.get(), error: null }
   }
 
   /**
@@ -188,9 +192,8 @@ class TimestampRequest {
       return response.json()
     }).catch((err) => {
       return {
-        error: {
-          message: err.message
-        }
+        message: err.message,
+        trace: err
       }
     })
   }
