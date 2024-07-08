@@ -13,7 +13,7 @@ class TimestampRequest {
    * @param cleanupTempFns
    * @param {object} tmpOptions
    */
-  constructor(tempFileService, tmpOptions, cleanupTempFns) {
+  constructor (tempFileService, tmpOptions, cleanupTempFns) {
     this.tempFileService = tempFileService
     this.tmpOptions = tmpOptions
     this.cleanupTempFns = cleanupTempFns
