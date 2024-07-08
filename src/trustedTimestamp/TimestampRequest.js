@@ -13,7 +13,7 @@ class TimestampRequest {
    * @param cleanupTempFns
    * @param {object} tmpOptions
    */
-  constructor (tempFileService, tmpOptions, cleanupTempFns) {
+  constructor(tempFileService, tmpOptions, cleanupTempFns) {
     this.tempFileService = tempFileService
     this.tmpOptions = tmpOptions
     this.cleanupTempFns = cleanupTempFns
@@ -93,9 +93,9 @@ class TimestampRequest {
       case 'oauth':
         return await this._getTimestampRequestOauth(url, auth, body, proxy, tsQuery)
       case 'noAuth':
-        return this._getTimestampRequestNoAuth(url)
+        return this._getTimestampRequestNoAuth(url, tsQuery)
       default:
-        return this._getTimestampRequestNoAuth(url)
+        return this._getTimestampRequestNoAuth(url, tsQuery)
     }
   }
 
@@ -172,7 +172,11 @@ class TimestampRequest {
    * @return {object}
    * @Private
    * */
-  _getTimestampRequestNoAuth (url) {
+  _getTimestampRequestNoAuth (url, tsQuery) {
+    this.setEncoding(null) // we expect binary data in a buffer: ensure that the response is not decoded unnecessarily
+    this.setResolveWithFullResponse(true)
+    this.setBody(tsQuery)
+
     return { requestUrl: url, tsRequest: this.get() }
   }
 
