@@ -1,4 +1,4 @@
-const parseRegex = require('../util/regexParser').parse
+import { parseRegex } from '../util/regexParser.js'
 /**
  * @class TimestampInfo
  * @property {Number} version
@@ -150,4 +150,4 @@ class TimestampInfo {
   }
 }
 
-module.exports = TimestampInfo
+export default TimestampInfo
