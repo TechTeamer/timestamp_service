@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.14.6",
-    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
     "@typescript-eslint/parser": "^7.13.1",
     "@vitest/coverage-v8": "^2.0.2",
     "eslint": "^8.19.0",
@@ -54,5 +54,10 @@
     "rollup-plugin-esbuild": "^6.1.1",
     "typescript": "^5.5.3",
     "vitest": "^2.0.2"
+  },
+  "resolutions": {
+    "strip-ansi": "6.0.1",
+    "string-width": "4.2.2",
+    "wrap-ansi": "7.0.0"
   }
 }
