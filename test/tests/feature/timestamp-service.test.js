@@ -23,7 +23,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
 
   describe('TrustedTimestampService - config check', () => {
     vi.resetModules()
-    it('success test - config ok', async () => {
+    it('success test - config ok', () => {
       const result = new TrustedTimestampService('normal', {
         certsLocation: '/etc/ssl/certs/',
         providers: [
@@ -51,10 +51,10 @@ describe('TrustedTimestampService.js (feature-test)', () => {
         ]
       })
 
-      await expect(result)
+      expect(result).toBeTruthy()
     })
 
-    it('success test - config ouath ok', async () => {
+    it('success test - config ouath ok', () => {
       const result = new TrustedTimestampService('normal', {
         certsLocation: '/etc/ssl/certs/',
         providers: [
@@ -76,16 +76,16 @@ describe('TrustedTimestampService.js (feature-test)', () => {
         ]
       })
 
-      await expect(result)
+      expect(result).toBeTruthy()
     })
 
-    it('fail test - config missing providers', async () => {
+    it('fail test - config missing providers', () => {
       expect(() => new TrustedTimestampService('normal', {
         certsLocation: '/etc/ssl/certs/'
       })).toThrow('trustedTimestamp config "providers" missing or empty!')
     })
 
-    it('fail test - config missing certsLocation', async () => {
+    it('fail test - config missing certsLocation', () => {
       expect(() => new TrustedTimestampService('normal', {
         providers: [
           {
@@ -128,9 +128,9 @@ describe('TrustedTimestampService.js (feature-test)', () => {
       scope.persist(false)
 
       const { timestamp, providerName } = await trustedTimestampServiceInstance.createTimestampToken(digest, hashAlgorithm, dataSize)
-      await expect(providerName).not.toBe(null)
-      await expect(timestamp).not.toBe(null)
-      await expect(timestamp.verified).toBe(true)
+      expect(providerName).not.toBe(null)
+      expect(timestamp).not.toBe(null)
+      expect(timestamp.verified).toBe(true)
     })
 
     it('success test - createTimestampToken - create ok oauth', async () => {
@@ -170,9 +170,9 @@ describe('TrustedTimestampService.js (feature-test)', () => {
       scope2.persist(false)
 
       const { timestamp, providerName } = await trustedTimestampServiceInstance.createTimestampToken(digest, hashAlgorithm, dataSize)
-      await expect(providerName).not.toBe(null)
-      await expect(timestamp).not.toBe(null)
-      await expect(timestamp.verified).toBe(true)
+      expect(providerName).not.toBe(null)
+      expect(timestamp).not.toBe(null)
+      expect(timestamp.verified).toBe(true)
     })
 
     it('success test - createTimestampToken - create ok wrong provider use next provider', async () => {
@@ -220,9 +220,9 @@ describe('TrustedTimestampService.js (feature-test)', () => {
       scope2.persist(false)
 
       const { timestamp, providerName } = await trustedTimestampServiceInstance.createTimestampToken(digest, hashAlgorithm, dataSize)
-      await expect(providerName).not.toBe(null)
-      await expect(timestamp).not.toBe(null)
-      await expect(timestamp.verified).toBe(true)
+      expect(providerName).not.toBe(null)
+      expect(timestamp).not.toBe(null)
+      expect(timestamp.verified).toBe(true)
     })
   })
 
@@ -257,7 +257,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
       scope.persist(false)
 
       const result = await trustedTimestampServiceInstance.getTimestampInfo(tsr, false)
-      await expect(result?.error).toBe(null)
+      expect(result?.error).toBe(null)
     })
   })
 
@@ -294,7 +294,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
       scope.persist(false)
 
       const result = await trustedTimestampServiceInstance.verifyToken(timestampToken, digest, dataSize)
-      await expect(result).toBe(true)
+      expect(result).toBe(true)
     })
   })
 
@@ -322,7 +322,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
       scope.persist(false)
 
       const result = await trustedTimestampServiceInstance.verifyTsr(digest, tsr, isToken)
-      await expect(result).toBe(true)
+      expect(result).toBe(true)
     })
   })
 
@@ -358,7 +358,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
       })
 
       const result = await trustedTimestampServiceInstance.testService()
-      await expect(result).not.toBe(null)
+      expect(result).not.toBe(null)
     })
   })
 })
