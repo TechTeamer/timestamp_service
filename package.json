@@ -1,6 +1,6 @@
 {
   "name": "@techteamer/timestamp",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "This package contains a TimestampService, which can create and verity timestamps",
   "main": "src/index.js",
   "author": "Techteamer",
