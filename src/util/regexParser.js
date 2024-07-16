@@ -1,3 +1,10 @@
+/**
+ * @param text {string}
+ * @param regex {RegExp}
+ * @param groups {number | number[]}
+ * @param revive {(value: any) => any}
+ * @returns {any|null}
+ */
 function parseRegex (text, regex, groups, revive) {
   const result = text.match(regex)
   if (!result) {
@@ -29,5 +36,5 @@ function createParser (regex, groups, revive) {
   }
 }
 
-module.exports.create = createParser
-module.exports.parse = parseRegex
+export { createParser as create }
+export { parseRegex }

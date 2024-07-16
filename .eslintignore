@@ -3,3 +3,5 @@ node_modules/
 bin/mc
 *.tar.gz
 *.sh
+dist
+build

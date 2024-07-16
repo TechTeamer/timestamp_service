@@ -1,5 +1,5 @@
-const fetch = require('node-fetch')
-const TimestampRequest = require('./TimestampRequest')
+import fetch from 'node-fetch'
+import TimestampRequest from './TimestampRequest.js'
 
 /**
 * TrustedTimestampRequest service implements timestamp request and sorted providers
@@ -193,4 +193,4 @@ class TrustedTimestampRequest {
   }
 }
 
-module.exports = TrustedTimestampRequest
+export default TrustedTimestampRequest

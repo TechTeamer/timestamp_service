@@ -28,4 +28,4 @@ function normalizeDigestFormat (format) {
     .replace(/-/g, '') // sha-256
 }
 
-module.exports = { checkDigestFormat, checkDigest, normalizeDigestFormat }
+export { checkDigestFormat, checkDigest, normalizeDigestFormat }

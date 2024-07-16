@@ -1,9 +1,16 @@
-const TimestampInfo = require('./TrustedTimestampInfo')
-const TrustedTimestampRequest = require('./TrustedTimestampRequest')
-const { getTsQuery, getTsVerify, getTsReply, generateTsReply, extractCertFromToken, checkSslPath } = require('./TrustedTimestampCommand')
-const { normalizeDigestFormat, checkDigestFormat, checkDigest } = require('./TrustedTimestampCheck')
-const TempFileService = require('../util/TempFileService')
-const { CertService } = require('@techteamer/cert-utils')
+import TimestampInfo from './TrustedTimestampInfo.js'
+import TrustedTimestampRequest from './TrustedTimestampRequest.js'
+import {
+  checkSslPath,
+  extractCertFromToken,
+  generateTsReply,
+  getTsQuery,
+  getTsReply,
+  getTsVerify
+} from './TrustedTimestampCommand.js'
+import { checkDigest, checkDigestFormat, normalizeDigestFormat } from './TrustedTimestampCheck.js'
+import TempFileService from '../util/TempFileService.js'
+import { CertService } from '@techteamer/cert-utils'
 
 /**
  * OpenSSL docs: https://www.openssl.org/docs/manmaster/man1/ts.html
@@ -14,7 +21,7 @@ const { CertService } = require('@techteamer/cert-utils')
  *
  * @class TrustedTimestampService
  * */
-class TrustedTimestampService {
+export class TrustedTimestampService {
   /**
    * @typedef {object}  provider
    * @property {string} name provider name
@@ -261,5 +268,3 @@ class TrustedTimestampService {
     return await checkSslPath()
   }
 }
-
-module.exports = TrustedTimestampService

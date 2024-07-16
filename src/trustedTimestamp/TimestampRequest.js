@@ -1,5 +1,5 @@
-const fetch = require('node-fetch')
-const fs = require('fs')
+import fetch from 'node-fetch'
+import fs from 'node:fs'
 
 /**
  * TimestampRequest class implements timestamp request
@@ -231,4 +231,4 @@ class TimestampRequest {
   }
 }
 
-module.exports = TimestampRequest
+export default TimestampRequest

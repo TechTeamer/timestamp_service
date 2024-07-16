@@ -1,4 +1,4 @@
-const { exec } = require('../util/child_process_promise')
+import { exec } from '../util/child_process_promise.js'
 
 /**
  * @param digest
@@ -82,4 +82,4 @@ async function checkSslPath () {
   })
 }
 
-module.exports = { getTsQuery, getTsVerify, getTsReply, generateTsReply, extractCertFromToken, checkSslPath }
+export { getTsQuery, getTsVerify, getTsReply, generateTsReply, extractCertFromToken, checkSslPath }

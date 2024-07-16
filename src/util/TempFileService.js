@@ -1,7 +1,7 @@
-const fs = require('fs-extra')
-const util = require('util')
+import fs from 'node:fs/promises'
+import util from 'node:util'
+import tmp from 'tmp'
 
-const tmp = require('tmp')
 tmp.setGracefulCleanup()
 
 const tmpFile = util.promisify((options, cb) => {
@@ -29,4 +29,4 @@ class TempFileService {
   }
 }
 
-module.exports = TempFileService
+export default TempFileService
