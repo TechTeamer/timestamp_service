@@ -223,7 +223,7 @@ class TimestampRequest {
     }
 
     tsRequest.body = new URLSearchParams(body)
-  
+
     if (proxy && proxy?.url) {
       tsRequest.agent = new ProxyAgent(proxy.url)
     }
