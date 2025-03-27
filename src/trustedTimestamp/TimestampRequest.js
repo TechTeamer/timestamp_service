@@ -1,5 +1,6 @@
 import fetch from 'node-fetch'
 import fs from 'node:fs'
+import { ProxyAgent } from 'proxy-agent'
 
 /**
  * TimestampRequest class implements timestamp request
@@ -49,7 +50,7 @@ class TimestampRequest {
    * @param {string} proxyUrl
    * */
   setProxy (proxyUrl) {
-    this.tsRequest.proxy = proxyUrl
+    this.tsRequest.agent = new ProxyAgent(proxyUrl)
   }
 
   /**
@@ -224,7 +225,7 @@ class TimestampRequest {
     tsRequest.body = new URLSearchParams(body)
 
     if (proxy && proxy?.url) {
-      tsRequest.proxy = proxy.url
+      tsRequest.agent = new ProxyAgent(proxy.url)
     }
 
     return tsRequest
