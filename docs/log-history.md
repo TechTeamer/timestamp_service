@@ -6,14 +6,18 @@ The createtimestamp function also returns a logHistory array.
 
 ---
 
-Usage implementation example:
+## Usage implementation example
 
-```
-const { timestamp, providerName, logHistory } = await this.trustedTimestampService.createTimestampToken(digest, hashAlgorithm, dataSize)
+```ts
+const { timestamp, providerName, logHistory } = await this.trustedTimestampService.createTimestampToken(
+  digest,
+  hashAlgorithm,
+  dataSize
+)
 console.log(logHistory)
 ```
 
-First provider success log history example:
+### First provider success log history example:
 
 ```
 {
@@ -28,7 +32,7 @@ First provider success log history example:
 }
 ```
 
-First provider failed, second provider success, log history example:
+### First provider failed, second provider success, log history example:
 
 ```
   {
@@ -57,4 +61,45 @@ First provider failed, second provider success, log history example:
     },
     errorTrace: null
   }
+```
+
+## All providers fail, log history example:
+
+A custom error is thrown with extra details available in the `context` property of the error instance.
+
+Error:
+
+```
+CreateTimestampTokenError: Failed to create trusted timestamp, no provider was available
+    at TrustedTimestampService.createTimestampToken (/workspace/timestamp_service/src/trustedTimestamp/TrustedTimestampService.js:168:15)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at /workspace/timestamp_service/test/tests/feature/timestamp-service.test.ts:257:9
+    at runTest (file:///workspace/timestamp_service/node_modules/@vitest/runner/dist/index.js:939:11)
+    at runSuite (file:///workspace/timestamp_service/node_modules/@vitest/runner/dist/index.js:1095:15)
+    at runSuite (file:///workspace/timestamp_service/node_modules/@vitest/runner/dist/index.js:1095:15)
+    at runSuite (file:///workspace/timestamp_service/node_modules/@vitest/runner/dist/index.js:1095:15)
+    at runFiles (file:///workspace/timestamp_service/node_modules/@vitest/runner/dist/index.js:1152:5)
+    at startTests (file:///workspace/timestamp_service/node_modules/@vitest/runner/dist/index.js:1161:3)
+    at file:///workspace/timestamp_service/node_modules/vitest/dist/chunks/runtime-runBaseTests.DJ9UidQ0.js:122:11 {
+  context: { providerName: 'wrong provider', logHistory: [ [Object] ] }
+}
+```
+
+Fetching context from error:
+
+```ts
+try {
+  const { timestamp, providerName, logHistory } = await trustedTimestampServiceInstance.createTimestampToken(
+    digest,
+    hashAlgorithm,
+    dataSize
+  )
+
+  console.log({ timestamp, providerName, logHistory })
+} catch (error) {
+  if (error as CreateTimestampTokenError) {
+    const { providerName, logHistory } = error.context
+    console.error({ providerName, logHistory })
+  }
+}
 ```
