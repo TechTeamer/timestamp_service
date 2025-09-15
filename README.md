@@ -16,27 +16,27 @@ Trustedtimestamp service implements the generate and verification of timestamps.
 
 ## Install
 
-
-```
+```shell
 $ yarn add @techteamer/timestamp
 ```
 
 ### Usage
 
-```
+```ts
 const { TrustedTimestampService: TrustedTimestampServiceLib } = require('@techteamer/timestamp')
 ...
 this.trustedTimestampService = new TrustedTimestampServiceLib('normal', config.get('trustedTimestamp'), config.get('certService.encoding', 'latin1'))
 ```
 
 #### Params
+
 1. TimestampInfo output type format: normal, short
 2. config: prodiders and cert location, config.get('trustedTimestamp')
 3. encode type(optional): config.get('certService.encoding', 'latin1')
 
 ### Default config
 
-```
+```json
   "trustedTimestamp": {
     "certsLocation": "/etc/ssl/certs/",
     "providers": [
@@ -55,17 +55,21 @@ this.trustedTimestampService = new TrustedTimestampServiceLib('normal', config.g
 ### Config provider options
 
 #### Required fields
-* name (string)
-* url (string | object): Simple url string or object {getTokenUrl: string, getTimestampUrl: string}
+
+- name (string)
+- url (string | object): Simple url string or object {getTokenUrl: string, getTimestampUrl: string}
 
 #### Optional fields
-* auth (object): Username and password for auth (object): {user: string, pass: string}
-* priority (number) - The order of the service providers can be changed, the higher number is the first
-* body (object) -  The infocert type provider can set body parameter
----------------------------------
+
+- auth (object): Username and password for auth (object): {user: string, pass: string}
+- priority (number) - The order of the service providers can be changed, the higher number is the first
+- body (object) - The infocert type provider can set body parameter
+
+---
 
 ### Config example
-```
+
+```json
   "trustedTimestamp": {
     {
       "certsLocation": "/etc/ssl/certs/",
@@ -100,7 +104,6 @@ this.trustedTimestampService = new TrustedTimestampServiceLib('normal', config.g
 ```
 
 ### Public methods
-
 
 - `getTimestampInfo`
 - `createTimestampToken`
