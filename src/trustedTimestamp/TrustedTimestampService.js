@@ -10,7 +10,12 @@ import {
 } from './TrustedTimestampCommand.js'
 import { checkDigest, checkDigestFormat, normalizeDigestFormat } from './TrustedTimestampCheck.js'
 import TempFileService from '../util/TempFileService.js'
+import { CreateTimestampTokenError } from './error/create-timestamp-token.error.ts'
 import { CertService } from '@techteamer/cert-utils'
+
+/**
+ * @typedef {import('./types/timestamp-token.type').CreatedTimestampToken} CreatedTimestampToken
+ */
 
 /**
  * OpenSSL docs: https://www.openssl.org/docs/manmaster/man1/ts.html
@@ -141,28 +146,10 @@ export class TrustedTimestampService {
    * The returned timestamp token represents the token
    * and contains the tsr with the verification result.
    *
-   * @typedef {object}  result
-   * @property {object} timestamp
-   * @property {string} providerName
-   *
-   * @typedef {object}  timestamp
-   * @property {string} digest
-   * @property {string} hashAlgorithm
-   * @property {number} dataSize
-   * @property {object} tsr
-   * @property {boolean} isToken
-   * @property {string} certExpiry
-   * @property {boolean | null} verified
-   *
-   * @typedef {returnObject}  result
-   * @property {Promise<result>} timestamp
-   * @property {string} providerName
-   * @property {array} logHistory
-   *
    * @param {String} digest
    * @param {String} hashAlgorithm a valid option that openssl accepts (e.g: 'sha256', 'sha512')
    * @param {Number} dataSize the size of the data the digest is generated from
-   * @return {returnObject}
+   * @return {CreatedTimestampToken}
    * */
   async createTimestampToken (digest, hashAlgorithm, dataSize) {
     const digestFormat = normalizeDigestFormat(hashAlgorithm)
@@ -178,7 +165,7 @@ export class TrustedTimestampService {
       const tsQuery = await getTsQuery(digest, digestFormat)
       const { tsr, providerName, logHistory } = await this.timestampRequest.getTimestamp(tsQuery)
       if (!tsr) {
-        throw new Error('Failed to create trusted timestamp, no provider was available')
+        throw new CreateTimestampTokenError('Failed to create trusted timestamp, no provider was available', { providerName, logHistory })
       }
       const timestampInfo = await this.getTimestampInfo(tsr, false)
       const certExpiry = timestampInfo.certInfo?.notAfter || null
@@ -196,7 +183,7 @@ export class TrustedTimestampService {
 
       return { timestamp: tt, providerName, logHistory }
     } catch (err) {
-      throw new Error(`Failed to create trusted timestamp ${err.message}`)
+      throw new CreateTimestampTokenError(`Failed to create trusted timestamp ${err.message}`)
     }
   }
 
