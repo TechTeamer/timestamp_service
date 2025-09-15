@@ -1,21 +1,16 @@
-import dts from 'rollup-plugin-dts'
-import build from 'rollup-plugin-esbuild'
-import path from 'node:path'
+import typescript from '@rollup/plugin-typescript'
 
 const name = './build/timestamp_config'
 
 const bundle = config => ({
   ...config,
-  input: 'src/index.js',
+  input: 'src/index.ts',
   external: id => !/^[./]/.test(id)
 })
 
 export default [
   bundle({
-    plugins: [build({
-      tsconfig: path.resolve('tsconfig.json'),
-      target: 'es2022'
-    })],
+    plugins: [typescript()],
     output: [
       {
         file: `${name}.cjs`,
@@ -28,12 +23,5 @@ export default [
         sourcemap: true
       }
     ]
-  }),
-  bundle({
-    plugins: [dts()],
-    output: {
-      file: `${name}.d.ts`,
-      format: 'es'
-    }
   })
 ]

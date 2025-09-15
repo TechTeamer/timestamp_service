@@ -9,7 +9,7 @@
     ".": {
       "import": "./build/timestamp_config.mjs",
       "require": "./build/timestamp_config.cjs",
-      "types": "./build/timestamp_config.d.ts",
+      "types": "./build/src/index.d.ts",
       "default": "./build/timestamp_config.mjs"
     }
   },
@@ -30,6 +30,7 @@
     "vitest:feature": "yarn vitest feature/",
     "lint": "eslint . && echo 'npm run lint: OK'",
     "lint:fix": "eslint . --fix",
+    "format": "prettier -w .",
     "test": "npm run lint --silent && echo 'npm test: OK'"
   },
   "type": "module",
@@ -40,18 +41,20 @@
     "tmp": "^0.2.1"
   },
   "devDependencies": {
+    "@rollup/plugin-typescript": "^12.1.4",
     "@types/node": "^20.14.6",
     "@typescript-eslint/eslint-plugin": "^7.16.0",
     "@typescript-eslint/parser": "^7.13.1",
     "@vitest/coverage-v8": "^2.0.2",
     "eslint": "^8.19.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^16.3.1",
     "eslint-plugin-promise": "^6.0.0",
     "nock": "^13.5.4",
+    "prettier": "^3.6.2",
     "rollup": "^4.18.0",
-    "rollup-plugin-dts": "^6.1.1",
     "rollup-plugin-esbuild": "^6.1.1",
     "typescript": "^5.5.3",
     "vitest": "^2.0.2"
