@@ -2,6 +2,7 @@ import { vi, expect, it, beforeEach, describe } from 'vitest'
 import nock from 'nock'
 import '../mocks/TrustedTimestampCommand.mock.js'
 import { TrustedTimestampService } from '../../../src/trustedTimestamp/TrustedTimestampService.js'
+import { CreateTimestampTokenError } from '../../../src/trustedTimestamp/error/create-timestamp-token.error.ts'
 
 vi.mock('@techteamer/cert-utils', () => ({
   CertService: vi.fn().mockImplementation(() => ({
@@ -223,6 +224,47 @@ describe('TrustedTimestampService.js (feature-test)', () => {
       expect(providerName).not.toBe(null)
       expect(timestamp).not.toBe(null)
       expect(timestamp.verified).toBe(true)
+    })
+
+    it('failed test - createTimestampToken - create failed', async () => {
+      const trustedTimestampServiceInstance = new TrustedTimestampService('normal', {
+        certsLocation: '/etc/ssl/certs/',
+        providers: [
+          {
+            name: 'wrong provider',
+            url: 'https://localhost/wrong',
+            auth: {
+              user: 'username',
+              pass: 'password'
+            }
+          }
+        ]
+      })
+
+      const digest = 'f1d44c9a9f3c6f12536f46e8f06cbe3001954e9e684ccabb99dd36ca296f7bd0'
+      const hashAlgorithm = 'sha256'
+      const dataSize = 210893
+
+      const scope = nock('http://localhost')
+        .post('/token')
+        .reply(200, { access_token: 'f1d44c9a9f3c6d12536f46e8f06bbe3001954e9e684ccabb99dd36ca296f7bd0' })
+      scope.persist(false)
+
+      const scope2 = nock('http://localhost').post('/timestamp').reply(200, {})
+      scope2.persist(false)
+
+      try {
+        await trustedTimestampServiceInstance.createTimestampToken(digest, hashAlgorithm, dataSize)
+
+        throw new Error('Expected function to throw')
+      } catch (error) {
+        expect(error).toBeInstanceOf(CreateTimestampTokenError)
+        expect((error as CreateTimestampTokenError).message).toEqual(
+          'Failed to create trusted timestamp, no provider was available'
+        )
+        expect((error as CreateTimestampTokenError).context.providerName).toEqual('wrong provider')
+        expect(Array.isArray((error as CreateTimestampTokenError).context.logHistory)).toEqual(true)
+      }
     })
   })
 
