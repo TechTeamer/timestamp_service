@@ -50,7 +50,7 @@ export class TrustedTimestampService {
    * @param {config} config
    * @param {string} encoding
    */
-  constructor (timestampInfoType = 'normal', config, encoding = 'latin1') {
+  constructor(timestampInfoType = 'normal', config, encoding = 'latin1') {
     this.timestampInfoType = timestampInfoType
     this.config = config
     this.encoding = encoding
@@ -63,7 +63,7 @@ export class TrustedTimestampService {
    * @return void
    * @private
    * */
-  _init () {
+  _init() {
     this.tmpOptions = { prefix: 'request-', postfix: '.tsr' }
 
     if (this.config) {
@@ -90,7 +90,7 @@ export class TrustedTimestampService {
    * @param [isToken=false] true if the input is a timestamp token (not a whole timestamp response)
    * @return {Promise<TimestampInfo>}
    * */
-  async getTimestampInfo (tsr, isToken = false) {
+  async getTimestampInfo(tsr, isToken = false) {
     const cleanupTempFns = []
     let inputTempPath = ''
 
@@ -151,7 +151,7 @@ export class TrustedTimestampService {
    * @param {Number} dataSize the size of the data the digest is generated from
    * @return {CreatedTimestampToken}
    * */
-  async createTimestampToken (digest, hashAlgorithm, dataSize) {
+  async createTimestampToken(digest, hashAlgorithm, dataSize) {
     const digestFormat = normalizeDigestFormat(hashAlgorithm)
 
     try {
@@ -165,7 +165,10 @@ export class TrustedTimestampService {
       const tsQuery = await getTsQuery(digest, digestFormat)
       const { tsr, providerName, logHistory } = await this.timestampRequest.getTimestamp(tsQuery)
       if (!tsr) {
-        throw new CreateTimestampTokenError('Failed to create trusted timestamp, no provider was available', { providerName, logHistory })
+        throw new CreateTimestampTokenError('Failed to create trusted timestamp, no provider was available', {
+          providerName,
+          logHistory
+        })
       }
       const timestampInfo = await this.getTimestampInfo(tsr, false)
       const certExpiry = timestampInfo.certInfo?.notAfter || null
@@ -182,8 +185,12 @@ export class TrustedTimestampService {
       tt.verified = await this.verifyToken(tt, digest, dataSize)
 
       return { timestamp: tt, providerName, logHistory }
-    } catch (err) {
-      throw new CreateTimestampTokenError(`Failed to create trusted timestamp ${err.message}`)
+    } catch (error) {
+      if (error instanceof CreateTimestampTokenError) {
+        throw error
+      }
+
+      throw new CreateTimestampTokenError(`Failed to create trusted timestamp ${error.message}`)
     }
   }
 
@@ -195,13 +202,17 @@ export class TrustedTimestampService {
    * @param {Number} dataSize
    * @return {Promise<boolean>}
    * */
-  async verifyToken (timestampToken, digest, dataSize) {
+  async verifyToken(timestampToken, digest, dataSize) {
     if (timestampToken.dataSize !== dataSize) {
-      throw new Error(`Timestamp token verification failed: The provided data size (${dataSize}) does not match the time stamped size (${timestampToken.dataSize}).`)
+      throw new Error(
+        `Timestamp token verification failed: The provided data size (${dataSize}) does not match the time stamped size (${timestampToken.dataSize}).`
+      )
     }
 
     if (timestampToken.digest !== digest) {
-      throw new Error(`Timestamp token verification failed: The provided digest (${digest}) does not match the time stamped digest (${timestampToken.digest}).`)
+      throw new Error(
+        `Timestamp token verification failed: The provided digest (${digest}) does not match the time stamped digest (${timestampToken.digest}).`
+      )
     }
 
     // verify token
@@ -216,7 +227,7 @@ export class TrustedTimestampService {
    * @param {Boolean} [isToken=false] indicates that whether the input is a timestamp token or response
    * @return {Promise<boolean>}
    * */
-  async verifyTsr (digest, tsr, isToken = false) {
+  async verifyTsr(digest, tsr, isToken = false) {
     let cleanupTempFile = null
 
     try {
@@ -251,7 +262,7 @@ export class TrustedTimestampService {
    *
    * @return {Promise<string>}
    * */
-  async testService () {
+  async testService() {
     return await checkSslPath()
   }
 }
