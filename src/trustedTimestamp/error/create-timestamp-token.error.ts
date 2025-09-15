@@ -1,12 +1,13 @@
-import { CreatedTimestampToken } from '../types/timestamp-token.type.js'
+import { CreatedTimestampToken } from '../types/timestamp-token.type.js';
 
-export type CreateTimestampTokenErrorContext = Partial<Pick<CreatedTimestampToken, 'logHistory' | 'providerName'>>
+export type CreateTimestampTokenErrorContext = Partial<Pick<CreatedTimestampToken, 'logHistory' | 'providerName'>>;
 
 export class CreateTimestampTokenError extends Error {
-  constructor (
+  constructor(
     message: string,
-        readonly context: CreateTimestampTokenErrorContext = {},
-        options?: ErrorOptions) {
-    super(message, options)
+    readonly context: CreateTimestampTokenErrorContext = {},
+    options?: ErrorOptions,
+  ) {
+    super(message, options);
   }
 }
