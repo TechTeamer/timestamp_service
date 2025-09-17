@@ -1,28 +1,10 @@
 {
-    "root": true,
-    "extends": ["standard", "plugin:n/recommended", "plugin:@typescript-eslint/recommended", "prettier"],
-    "rules": {
-      "curly": ["error", "all"],
-      "brace-style": ["error", "1tbs", { "allowSingleLine": false }],
-      "guard-for-in": "error",
-      "no-console": "error",
-      "no-debugger": "error",
-      "radix": "error",
-      "n/no-deprecated-api": "warn",
-      "n/no-process-exit": "off",
-      "no-process-exit": "off",
-      "n/shebang": "off",
-      "no-empty-function": "error",
-      "no-shadow": "warn",
-      "n/no-unpublished-import": "off"
-    },
-    "env": {
-      "commonjs": true,
-      "es6": true
-    },
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-      "ecmaVersion": 2020,
-      "sourceType": "module"
-    }
-  }
+  "root": true,
+  "extends": ["plugin:@typescript-eslint/recommended", "prettier"],
+  "rules": {
+    "@typescript-eslint/no-useless-constructor": "error",
+    "@typescript-eslint/no-empty-function": "error",
+    "@typescript-eslint/explicit-function-return-type": "error"
+  },
+  "parser": "@typescript-eslint/parser"
+}

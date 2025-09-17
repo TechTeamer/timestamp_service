@@ -1,18 +1,16 @@
-Timestamp
-=============
+# Timestamp
 
 Trustedtimestamp service implements the generate and verification of timestamps.
 
-* [Install](#install)
-* [Usage](#usage)
-  * [Params](#params) 
-* [Default config](#default-config)
-* [Config provider options](#config-provider-options)
-  * [Required fields](#required-fields)
-  * [Optional fields](#optional-fields)
-* [Config example](#config-example)
-* [Public methods](#public-methods)
-
+- [Install](#install)
+- [Usage](#usage)
+  - [Params](#params)
+- [Default config](#default-config)
+- [Config provider options](#config-provider-options)
+  - [Required fields](#required-fields)
+  - [Optional fields](#optional-fields)
+- [Config example](#config-example)
+- [Public methods](#public-methods)
 
 ## Install
 

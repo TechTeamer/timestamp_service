@@ -1,3 +1,3 @@
-export * from './trustedTimestamp/TrustedTimestampService.js'
+export * from './trustedTimestamp/TrustedTimestampService'
 
-export * from './trustedTimestamp/error/create-timestamp-token.error.js'
+export * from './trustedTimestamp/error/create-timestamp-token.error'
