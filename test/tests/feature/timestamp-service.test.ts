@@ -1,18 +1,19 @@
 import { vi, expect, it, beforeEach, describe } from 'vitest'
 import nock from 'nock'
-import '../mocks/TrustedTimestampCommand.mock.js'
-import { TrustedTimestampService } from '../../../src/trustedTimestamp/TrustedTimestampService.js'
-import { CreateTimestampTokenError } from '../../../src/trustedTimestamp/error/create-timestamp-token.error.ts'
+import '../mocks/TrustedTimestampCommand.mock'
+import { TrustedTimestampService } from '../../../src/trustedTimestamp/TrustedTimestampService'
+import { CreateTimestampTokenError } from '../../../src/trustedTimestamp/error/create-timestamp-token.error'
+import { TimestampConfig } from '../../../src/trustedTimestamp/types/timestamp-config.type'
 
 vi.mock('@techteamer/cert-utils', () => ({
   CertService: vi.fn().mockImplementation(() => ({
-    get CertType () {
+    get CertType(): { P12: 'P12'; PEM: 'PEM' } {
       return {
         P12: 'P12',
         PEM: 'PEM'
       }
     },
-    parseCert: () => { /**/ }
+    parseCert: (): null => null
   }))
 }))
 
@@ -81,24 +82,30 @@ describe('TrustedTimestampService.js (feature-test)', () => {
     })
 
     it('fail test - config missing providers', () => {
-      expect(() => new TrustedTimestampService('normal', {
-        certsLocation: '/etc/ssl/certs/'
-      })).toThrow('trustedTimestamp config "providers" missing or empty!')
+      expect(
+        () =>
+          new TrustedTimestampService('normal', {
+            certsLocation: '/etc/ssl/certs/'
+          } as TimestampConfig)
+      ).toThrow('trustedTimestamp config "providers" missing or empty!')
     })
 
     it('fail test - config missing certsLocation', () => {
-      expect(() => new TrustedTimestampService('normal', {
-        providers: [
-          {
-            name: 'bteszt',
-            url: 'https://bteszt.e-szigno.hu/tsa',
-            auth: {
-              user: 'username',
-              pass: 'password'
-            }
-          }
-        ]
-      })).toThrow('trustedTimestamp config "certsLocation" missing!')
+      expect(
+        () =>
+          new TrustedTimestampService('normal', {
+            providers: [
+              {
+                name: 'bteszt',
+                url: 'https://bteszt.e-szigno.hu/tsa',
+                auth: {
+                  user: 'username',
+                  pass: 'password'
+                }
+              }
+            ]
+          } as TimestampConfig)
+      ).toThrow('trustedTimestamp config "certsLocation" missing!')
     })
   })
 
@@ -123,12 +130,14 @@ describe('TrustedTimestampService.js (feature-test)', () => {
       const hashAlgorithm = 'sha256'
       const dataSize = 210893
 
-      const scope = nock('https://bteszt.e-szigno.hu')
-        .post('/tsa')
-        .reply(200, { })
+      const scope = nock('https://bteszt.e-szigno.hu').post('/tsa').reply(200, {})
       scope.persist(false)
 
-      const { timestamp, providerName } = await trustedTimestampServiceInstance.createTimestampToken(digest, hashAlgorithm, dataSize)
+      const { timestamp, providerName } = await trustedTimestampServiceInstance.createTimestampToken(
+        digest,
+        hashAlgorithm,
+        dataSize
+      )
       expect(providerName).not.toBe(null)
       expect(timestamp).not.toBe(null)
       expect(timestamp.verified).toBe(true)
@@ -170,7 +179,11 @@ describe('TrustedTimestampService.js (feature-test)', () => {
         .reply(200, { access_token: 'f1d44c9a9f3c6f12536f46e8f06cbe3001954e9e684ccabb99dd36ca296f7bd0' })
       scope2.persist(false)
 
-      const { timestamp, providerName } = await trustedTimestampServiceInstance.createTimestampToken(digest, hashAlgorithm, dataSize)
+      const { timestamp, providerName } = await trustedTimestampServiceInstance.createTimestampToken(
+        digest,
+        hashAlgorithm,
+        dataSize
+      )
       expect(providerName).not.toBe(null)
       expect(timestamp).not.toBe(null)
       expect(timestamp.verified).toBe(true)
@@ -215,12 +228,14 @@ describe('TrustedTimestampService.js (feature-test)', () => {
         .reply(200, { access_token: 'f1d44c9a9f3c6d12536f46e8f06bbe3001954e9e684ccabb99dd36ca296f7bd0' })
       scope.persist(false)
 
-      const scope2 = nock('http://localhost')
-        .post('/timestamp')
-        .reply(200, { })
+      const scope2 = nock('http://localhost').post('/timestamp').reply(200, {})
       scope2.persist(false)
 
-      const { timestamp, providerName } = await trustedTimestampServiceInstance.createTimestampToken(digest, hashAlgorithm, dataSize)
+      const { timestamp, providerName } = await trustedTimestampServiceInstance.createTimestampToken(
+        digest,
+        hashAlgorithm,
+        dataSize
+      )
       expect(providerName).not.toBe(null)
       expect(timestamp).not.toBe(null)
       expect(timestamp.verified).toBe(true)
@@ -283,19 +298,19 @@ describe('TrustedTimestampService.js (feature-test)', () => {
         ]
       })
 
-      const tsr = Buffer.from(JSON.stringify({
-        digest: 'f1d44c9a9f3c6f12536f46e8f06cbe3001954e9e684ccabb99dd36ca296f7bd0',
-        hashAlgorithm: 'sha256',
-        dataSize: 210893,
-        tsr: {},
-        isToken: false,
-        certExpiry: null,
-        verified: null
-      }))
+      const tsr = Buffer.from(
+        JSON.stringify({
+          digest: 'f1d44c9a9f3c6f12536f46e8f06cbe3001954e9e684ccabb99dd36ca296f7bd0',
+          hashAlgorithm: 'sha256',
+          dataSize: 210893,
+          tsr: {},
+          isToken: false,
+          certExpiry: null,
+          verified: null
+        })
+      )
 
-      const scope = nock('http://127.0.0.1')
-        .post('/?token=xxxxx')
-        .reply(200, { })
+      const scope = nock('http://127.0.0.1').post('/?token=xxxxx').reply(200, {})
       scope.persist(false)
 
       const result = await trustedTimestampServiceInstance.getTimestampInfo(tsr, false)
@@ -322,7 +337,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
         digest: '7c86796d0bba6cda5805fe327200528f65fbab8847d7c847f2fc29dfede24343',
         hashAlgorithm: 'sha256',
         dataSize: 458,
-        tsr: '',
+        tsr: Buffer.from(''),
         isToken: false,
         certExpiry: null,
         verified: null
@@ -330,9 +345,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
       const digest = '7c86796d0bba6cda5805fe327200528f65fbab8847d7c847f2fc29dfede24343'
       const dataSize = 458
 
-      const scope = nock('http://127.0.0.1')
-        .post('/?token=xxxxx')
-        .reply(200, { })
+      const scope = nock('http://127.0.0.1').post('/?token=xxxxx').reply(200, {})
       scope.persist(false)
 
       const result = await trustedTimestampServiceInstance.verifyToken(timestampToken, digest, dataSize)
@@ -358,9 +371,7 @@ describe('TrustedTimestampService.js (feature-test)', () => {
       const tsr = Buffer.from('test')
       const digest = 'f1d44c9a9f3c6f12536f46e8f06cbe3001954e9e684ccabb99dd36ca296f7bd0'
       const isToken = false
-      const scope = nock('http://127.0.0.1')
-        .post('/?token=xxxxx')
-        .reply(200, { })
+      const scope = nock('http://127.0.0.1').post('/?token=xxxxx').reply(200, {})
       scope.persist(false)
 
       const result = await trustedTimestampServiceInstance.verifyTsr(digest, tsr, isToken)

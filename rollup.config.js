@@ -5,6 +5,7 @@ const name = './build/timestamp_config'
 const bundle = config => ({
   ...config,
   input: 'src/index.ts',
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   external: id => !/^[./]/.test(id)
 })
 

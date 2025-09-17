@@ -1,4 +1,4 @@
-import { CreatedTimestampToken } from '../types/timestamp-token.type.js'
+import { CreatedTimestampToken } from '../types/timestamp-token.type'
 
 export type CreateTimestampTokenErrorContext = Partial<Pick<CreatedTimestampToken, 'logHistory' | 'providerName'>>
 

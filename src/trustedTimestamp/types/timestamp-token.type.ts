@@ -1,15 +1,17 @@
+import { TimestampLog } from './timestamp-log.type'
+
 export interface Timestamp {
   digest: string
   hashAlgorithm: string
   dataSize: number
-  tsr: unknown
+  tsr: Buffer
   isToken: boolean
-  certExpiry: string
+  certExpiry: Date | null
   verified: boolean | null
 }
 
 export interface CreatedTimestampToken {
   timestamp: Timestamp
   providerName: string
-  logHistory: string[]
+  logHistory: TimestampLog[]
 }
