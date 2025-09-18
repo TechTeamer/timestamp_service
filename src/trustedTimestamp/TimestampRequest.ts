@@ -38,10 +38,10 @@ export class TimestampRequest {
   /**
    * set request header
    * */
-  setHeader(headers: Record<string, unknown>): void {
+  setHeader(headers: Record<string, string>): void {
     this.tsRequest = {
       ...this.tsRequest,
-      ...headers
+      headers
     }
   }
 
