@@ -55,8 +55,11 @@ export class TimestampRequest {
   /**
    * set request proxy
    * */
-  setProxy(proxyUrl: string): void {
-    this.tsRequest.agent = new ProxyAgent({ getProxyForUrl: (): string => proxyUrl })
+  setProxy(proxy: TimestampProviderProxyConfig): void {
+    this.tsRequest.agent = new ProxyAgent({
+      getProxyForUrl: (): string => proxy.url,
+      rejectUnauthorized: !(proxy.allowUnauthorized ?? false)
+    })
   }
 
   /**
@@ -223,7 +226,10 @@ export class TimestampRequest {
     }
 
     if (proxy?.url) {
-      tsRequest.agent = new ProxyAgent({ getProxyForUrl: (): string => proxy.url })
+      tsRequest.agent = new ProxyAgent({
+        getProxyForUrl: (): string => proxy.url,
+        rejectUnauthorized: !(proxy.allowUnauthorized ?? false)
+      })
     }
 
     return tsRequest

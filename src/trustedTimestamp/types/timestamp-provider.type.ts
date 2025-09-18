@@ -1,5 +1,6 @@
 export interface TimestampProviderProxyConfig {
   url: string
+  allowUnauthorized?: boolean
 }
 
 export interface TimestampProviderOAuthUrl {

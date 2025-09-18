@@ -148,7 +148,7 @@ export class TrustedTimestampRequest {
     const tsRequest = new TimestampRequest(this.tempFileService, this.tmpOptions, this.cleanupTempFns)
 
     if (proxy?.url) {
-      tsRequest.setProxy(proxy.url)
+      tsRequest.setProxy(proxy)
     }
 
     let requestType: TimestampRequestAuthTypes | undefined
