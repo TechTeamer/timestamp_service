@@ -167,7 +167,7 @@ export class TimestampRequest {
       this.setBody(fs.createReadStream(tempPath))
       this.setHeader({
         ...this.tsRequest.headers,
-        'Content-length': fileSizeInBytes
+        'Content-length': fileSizeInBytes.toString()
       })
     }
 
