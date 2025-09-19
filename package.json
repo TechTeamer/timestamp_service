@@ -36,7 +36,6 @@
   "type": "module",
   "dependencies": {
     "@techteamer/cert-utils": "^1.1.3",
-    "@types/node-fetch": "^3",
     "node-fetch": "^3",
     "proxy-agent": "^6.5.0",
     "tmp": "^0.2.1"
