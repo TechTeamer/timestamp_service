@@ -1,5 +1,5 @@
-import fetch from 'node-fetch'
 import { FileOptions as TempFileOptions } from 'tmp'
+import { fetch } from '../patch/node-fetch'
 
 import { TimestampRequest } from './TimestampRequest'
 import { TempFileService } from '../util/TempFileService'
