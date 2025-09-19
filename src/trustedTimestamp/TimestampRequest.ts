@@ -1,4 +1,5 @@
-import fetch, { BodyInit } from 'node-fetch'
+import type { BodyInit } from 'node-fetch'
+import { fetch } from '../patch/node-fetch'
 import fs from 'node:fs'
 import { ProxyAgent } from 'proxy-agent'
 import type { FileOptions } from 'tmp'
