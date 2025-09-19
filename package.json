@@ -1,6 +1,6 @@
 {
   "name": "@techteamer/timestamp",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "This package contains a TimestampService, which can create and verity timestamps",
   "main": "src/index.ts",
   "author": "Techteamer",
@@ -21,7 +21,7 @@
     "url": "https://github.com/TechTeamer/timestamp"
   },
   "engines": {
-    "node": ">=22.17.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "vitest": "vitest run --config test/vitest.config.ts",
