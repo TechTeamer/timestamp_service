@@ -1,6 +1,6 @@
 {
   "name": "@techteamer/timestamp",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "This package contains a TimestampService, which can create and verity timestamps",
   "main": "src/index.ts",
   "author": "Techteamer",
