@@ -1,0 +1,12 @@
+{
+  "name": "cjs",
+  "version": "1.0.0",
+  "main": "test/index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node app/createTimestamp.test.js"
+  },
+  "dependencies": {
+    "@techteamer/timestamp": "file:../../package/timestamp_service"
+  }
+}

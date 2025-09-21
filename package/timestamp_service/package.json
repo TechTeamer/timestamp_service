@@ -1,0 +1,68 @@
+{
+  "name": "@techteamer/timestamp",
+  "version": "2.0.1",
+  "description": "This package contains a TimestampService, which can create and verity timestamps",
+  "main": "src/index.ts",
+  "author": "Techteamer",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./build/timestamp_config.mjs",
+      "require": "./build/timestamp_config.cjs",
+      "types": "./build/src/index.d.ts",
+      "default": "./build/timestamp_config.mjs"
+    }
+  },
+  "files": [
+    "build"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TechTeamer/timestamp"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "vitest": "vitest run --config test/vitest.config.ts",
+    "build": "rollup -c",
+    "vitest:unit": "yarn vitest unit/",
+    "vitest:feature": "yarn vitest feature/",
+    "lint": "eslint ./src ./test && echo 'npm run lint: OK'",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier -w .",
+    "test": "npm run lint --silent && echo 'npm test: OK'"
+  },
+  "type": "module",
+  "dependencies": {
+    "@techteamer/cert-utils": "^1.1.3",
+    "@types/node-fetch": "^3",
+    "node-fetch": "^3",
+    "proxy-agent": "^6.5.0",
+    "tmp": "^0.2.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^12.1.4",
+    "@types/node": "^20.14.6",
+    "@types/tmp": "^0.2.6",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.13.1",
+    "@vitest/coverage-v8": "^2.0.2",
+    "eslint": "^8.19.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-config-standard": "^17.0.0",
+    "nock": "^13.5.4",
+    "prettier": "^3.6.2",
+    "rollup": "^4.18.0",
+    "rollup-plugin-esbuild": "^6.1.1",
+    "typescript": "~5.5",
+    "vitest": "^2.0.2"
+  },
+  "resolutions": {
+    "strip-ansi": "6.0.1"
+  },
+  "workspaces": [
+    "app/*",
+    "project/*"
+  ]
+}
