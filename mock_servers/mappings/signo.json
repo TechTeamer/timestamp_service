@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/tsa"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "tsa_response.json",
+    "headers": {
+      "Content-Type": "application/timestamp-reply"
+    }
+  }
+}

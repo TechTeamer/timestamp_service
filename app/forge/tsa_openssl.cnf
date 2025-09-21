@@ -1,0 +1,28 @@
+[ req ]
+default_bits        = 2048
+prompt              = no
+default_md          = sha256
+distinguished_name  = dn
+x509_extensions     = ext
+
+[ dn ]
+CN = Dummy TSA
+
+[ ext ]
+basicConstraints = critical,CA:FALSE
+keyUsage = digitalSignature, nonRepudiation
+extendedKeyUsage = timeStamping
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+
+[ tsa ]
+default_tsa = tsa_config1
+
+[ tsa_config1 ]
+serial               = tsa/serial
+signer_cert          = tsa.crt.pem
+certs                = tsa.crt.pem
+signer_key           = tsa.key.pem
+digest               = sha256
+policy               = 1.2.3.4.1
+clock_precision_digits = 2
