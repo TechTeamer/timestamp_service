@@ -31,7 +31,8 @@
     "lint": "eslint ./src ./test && echo 'npm run lint: OK'",
     "lint:fix": "eslint . --fix",
     "format": "prettier -w .",
-    "test": "npm run lint --silent && echo 'npm test: OK'"
+    "test": "npm run lint --silent && echo 'npm test: OK'",
+    "release": "rm -rf ./build && yarn build && npm publish"
   },
   "type": "module",
   "dependencies": {
@@ -60,9 +61,5 @@
   },
   "resolutions": {
     "strip-ansi": "6.0.1"
-  },
-  "workspaces": [
-    "app/*",
-    "project/*"
-  ]
+  }
 }
