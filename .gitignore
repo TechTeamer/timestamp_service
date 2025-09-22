@@ -14,8 +14,6 @@
 # Dependency directories
 node_modules/
 
-config/local.json
-
 # Optional npm cache directory
 .npm
 
@@ -28,5 +26,5 @@ config/local.json
 # IDE
 .idea
 .vscode
-/test/coverage/
-/build/
+/package/timestamp_service/test/coverage/
+/package/timestamp_service/build/
