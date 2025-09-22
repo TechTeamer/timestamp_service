@@ -1,8 +1,9 @@
 {
-  "name": "cjs",
+  "name": "mjs",
   "version": "1.0.0",
   "main": "app/createTimestamp.test.js",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "start": "node app/createTimestamp.test.js"
   },
