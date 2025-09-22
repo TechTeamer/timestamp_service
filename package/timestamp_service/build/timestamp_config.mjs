@@ -672,8 +672,6 @@ class TrustedTimestampService {
                 throw new Error(`Invalid digest: ${digest}`);
             }
             const tsQuery = await getTsQuery(digest, digestFormat);
-            console.log('!!!!!!!!!!!!!!!');
-            console.log(tsQuery);
             const { tsr, providerName, logHistory } = await this.timestampRequest.getTimestamp(tsQuery);
             if (!tsr) {
                 throw new CreateTimestampTokenError('Failed to create trusted timestamp, no provider was available', {
