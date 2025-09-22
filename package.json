@@ -8,8 +8,8 @@
     "package/*"
   ],
   "scripts": {
-    "test:cjs": "cd ./app/cjs/ && yarn start",
-    "test:mjs": "cd ./app/mjs/ && yarn start",
+    "test:cjs": "cd ./app/timestamp_cjs/ && yarn start",
+    "test:mjs": "cd ./app/timestamp_mjs/ && yarn start",
     "test": "yarn test:cjs && yarn test:mjs"
   }
 }
